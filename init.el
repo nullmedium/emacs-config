@@ -68,7 +68,9 @@
  '(cua-mode t)
  '(custom-enabled-themes '(developer-dark))
  '(custom-safe-themes
-   '("de2f009a49f8eaf2f323519d86016849cd1716d979bc3f7e4afb58899e52ddb7"
+   '("2974c2d5ffede4f111b02701ccdfadfbcde3d158ad9b09dade627b3ce3049ea1"
+     "f8859f15bd0089a85d8d14e21dd774a9a8b391dac076e3ff17a13529b3d16576"
+     "de2f009a49f8eaf2f323519d86016849cd1716d979bc3f7e4afb58899e52ddb7"
      "9fb69436c074b82a62b78b8d733e6274d0bd16d156f7b094e2afe4345c040c49"
      "004f174754c688f358fa2afc4f8699b5db647fbfaa0d6b55ff39f63e05bfbbf5"
      "ca1b398ceb1b61709197478dc7f705b8337a0a9631e399948e643520c5557382"
@@ -741,11 +743,11 @@
        (message "mu4e configuration available but mu4e not installed. Install mu4e package to enable email.")))))
 
 ;;; Theme Management
-(defun load-developer-dark-theme ()
-  "Load the custom developer-dark theme."
+(defun load-jens-dark-theme ()
+  "Load the custom jens-dark theme."
   (interactive)
-  (load-theme 'developer-dark t)
-  (message "Developer Dark theme loaded"))
+  (load-theme 'jens-dark t)
+  (message "Jens Dark theme loaded"))
 
 (defun switch-theme (theme)
   "Switch to a different theme interactively."

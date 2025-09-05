@@ -1,4 +1,7 @@
-;;; elfeed-config.el --- Elfeed RSS reader configuration
+;;; elfeed-config.el --- Elfeed RSS reader configuration -*- lexical-binding: t -*-
+
+;;; Commentary:
+;; Configuration for Elfeed RSS reader with custom faces and filtering functions
 
 ;;; Code:
 
@@ -361,11 +364,31 @@ If USE-GENERIC-P is non-nil, use eww-readable after loading."
   (define-key elfeed-show-mode-map (kbd "B") 'elfeed-open-in-browser))
 
 ;; Disable line numbers in elfeed buffers
-(add-hook 'elfeed-show-mode-hook (lambda () (display-line-numbers-mode 0)))
-(add-hook 'elfeed-search-mode-hook (lambda () (display-line-numbers-mode 0)))
+(add-hook 'elfeed-show-mode-hook 
+          (lambda () 
+            (display-line-numbers-mode -1)
+            (setq-local display-line-numbers nil)))
+            
+(add-hook 'elfeed-search-mode-hook 
+          (lambda () 
+            (display-line-numbers-mode -1)
+            (setq-local display-line-numbers nil)))
 
 ;; Disable line numbers in EWW
-(add-hook 'eww-mode-hook (lambda () (display-line-numbers-mode 0)))
+(add-hook 'eww-mode-hook 
+          (lambda () 
+            (display-line-numbers-mode -1)
+            (setq-local display-line-numbers nil)))
+
+;; Additional function to force disable line numbers in elfeed
+(defun elfeed-disable-line-numbers ()
+  "Forcefully disable line numbers in elfeed buffers."
+  (interactive)
+  (when (or (eq major-mode 'elfeed-search-mode)
+            (eq major-mode 'elfeed-show-mode))
+    (display-line-numbers-mode -1)
+    (setq-local display-line-numbers nil)
+    (message "Line numbers disabled in elfeed")))
 
 (provide 'elfeed-config)
 ;;; elfeed-config.el ends here
