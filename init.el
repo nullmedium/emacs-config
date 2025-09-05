@@ -66,9 +66,10 @@
  '(before-save-hook '(delete-trailing-whitespace))
  '(column-number-mode t)
  '(cua-mode t)
- '(custom-enabled-themes '(modus-vivendi))
+ '(custom-enabled-themes '(developer-dark))
  '(custom-safe-themes
-   '("9fb69436c074b82a62b78b8d733e6274d0bd16d156f7b094e2afe4345c040c49"
+   '("de2f009a49f8eaf2f323519d86016849cd1716d979bc3f7e4afb58899e52ddb7"
+     "9fb69436c074b82a62b78b8d733e6274d0bd16d156f7b094e2afe4345c040c49"
      "004f174754c688f358fa2afc4f8699b5db647fbfaa0d6b55ff39f63e05bfbbf5"
      "ca1b398ceb1b61709197478dc7f705b8337a0a9631e399948e643520c5557382"
      "75eef60308d7328ed14fa27002e85de255c2342e73275173a14ed3aa1643d545"
@@ -122,9 +123,9 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(default ((t (:family "0xProto Nerd Font" :foundry "0x  " :slant normal :weight regular :height 120 :width normal))))
- '(diff-hl-insert ((t (:background "green3" :foreground "green3"))))
+ '(diff-hl-change ((t (:background "blue3" :foreground "blue3"))))
  '(diff-hl-delete ((t (:background "red3" :foreground "red3"))))
- '(diff-hl-change ((t (:background "blue3" :foreground "blue3")))))
+ '(diff-hl-insert ((t (:background "green3" :foreground "green3")))))
 
 ;;; Helm Configuration (Primary interface)
 (use-package helm
@@ -738,6 +739,22 @@
           (message "mu4e email configuration loaded."))
       (error
        (message "mu4e configuration available but mu4e not installed. Install mu4e package to enable email.")))))
+
+;;; Theme Management
+(defun load-developer-dark-theme ()
+  "Load the custom developer-dark theme."
+  (interactive)
+  (load-theme 'developer-dark t)
+  (message "Developer Dark theme loaded"))
+
+(defun switch-theme (theme)
+  "Switch to a different theme interactively."
+  (interactive
+   (list (intern (completing-read "Load theme: "
+                                  (mapcar #'symbol-name (custom-available-themes))))))
+  (mapc #'disable-theme custom-enabled-themes)
+  (load-theme theme t)
+  (message "Switched to %s theme" theme))
 
 ;;; Development Mode Information
 (defun show-dev-mode-info ()
