@@ -39,7 +39,13 @@
         ibuffer-sidebar ibuffer-projectile
 
         ;; Required for some functionality
-        org dash s f ht spinner lv hydra avy))
+        org dash s f ht spinner lv hydra avy
+
+        ;; RSS/News reader
+        elfeed elfeed-org
+
+        ;; Email (mu4e installed separately)
+        ))
 
 ;; Auto-install missing packages
 (when (cl-find-if-not #'package-installed-p package-selected-packages)
@@ -697,11 +703,24 @@
     (when (file-exists-p dev-config)
       (load-file dev-config)))
 
+  ;; Reload elfeed config if it exists
+  (let ((elfeed-config (expand-file-name "elfeed-config.el" user-emacs-directory)))
+    (when (file-exists-p elfeed-config)
+      (load-file elfeed-config)))
+
+
+  (message "Emacs configuration fully reloaded!"))
 
 ;;; Final Keybindings
 (global-set-key (kbd "C-x k") 'kill-current-buffer-no-confirm)
 (global-set-key (kbd "C-c C-r") 'reload-emacs-config)
 (global-set-key (kbd "C-x C-b") 'helm-buffers-list)
+
+;;; RSS Reader Configuration (Elfeed)
+(let ((elfeed-config (expand-file-name "elfeed-config.el" user-emacs-directory)))
+  (when (file-exists-p elfeed-config)
+    (load-file elfeed-config)
+    (message "Elfeed RSS reader configuration loaded.")))
 
 ;;; Development Mode Information
 (defun show-dev-mode-info ()
