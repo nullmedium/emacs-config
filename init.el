@@ -632,10 +632,16 @@
   (kill-buffer (current-buffer)))
 
 (defun reload-emacs-config ()
-  "Reload the Emacs configuration file."
+  "Reload the Emacs configuration file and all dependent configs."
   (interactive)
+  ;; First reload the main init.el
   (load-file (expand-file-name "init.el" user-emacs-directory))
-  (message "Emacs configuration reloaded!"))
+
+  ;; Reload development config if it exists
+  (let ((dev-config (expand-file-name "emacs-dev-config.el" user-emacs-directory)))
+    (when (file-exists-p dev-config)
+      (load-file dev-config)))
+
 
 ;;; Final Keybindings
 (global-set-key (kbd "C-x k") 'kill-current-buffer-no-confirm)
