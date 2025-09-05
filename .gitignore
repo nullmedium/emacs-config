@@ -1,0 +1,115 @@
+# Emacs temporary and backup files
+*~
+\#*\#
+.\#*
+*.elc
+*.pyc
+*.pyo
+
+# Auto-save files
+auto-save-list/
+\#*
+.saves-*
+
+# Backup directory
+backups/
+
+# Session files
+.emacs.desktop
+.emacs.desktop.lock
+emacs-desktop
+session.*
+.session
+
+# History and state files
+recentf
+savehist
+saveplace
+places
+.recentf
+
+# Package management
+elpa/
+straight/
+quelpa/
+eln-cache/
+.cache/
+
+# LSP and language server files
+.lsp-session-*
+.dap-breakpoints
+workspace/
+
+# Projectile
+projectile-bookmarks.eld
+projectile.cache
+projects.eld
+
+# Treemacs
+.treemacs-persist
+
+# Company
+company-statistics-cache.el
+
+# Transient
+transient/
+
+# URL cache
+url/
+
+# Network security
+network-security.data
+
+# Custom configurations (machine-specific)
+custom.el
+.custom.el
+
+# Tramp
+tramp
+
+# Eshell
+eshell/
+
+# Org mode
+org-clock-save.el
+
+# Bookmarks
+bookmarks
+
+# Abbrev
+abbrev_defs
+
+# Games scores
+games/
+
+# Calculator
+calc-trail
+
+# Markdown preview
+.markdown-preview.html
+
+# Symbol finder (from your config)
+# symbol_finder.py - Keep this, it's needed by symbol-finder.el
+
+# Test files
+test-*.el
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Keep these files
+!init.el
+!emacs-dev-config.el
+!init-bungee.el
+!bungee.el
+!qml-config.el
+!symbol-finder.el
+!symbol_finder.py
+!keybinding-reference.md
