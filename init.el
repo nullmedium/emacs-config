@@ -200,24 +200,24 @@
   ;; Configure VC backend for Git
   (setq vc-handled-backends '(Git))
   (setq vc-git-diff-switches '("--histogram"))
-  
+
   ;; IMPORTANT: Tell diff-hl to use VC backend, not Magit
   (setq diff-hl-reference-revision nil) ; Use working tree, not index
   (setq diff-hl-disable-on-remote nil)  ; Work even on remote files
-  
+
   ;; Make diff-hl use the left fringe
   (setq diff-hl-side 'left)
-  
+
   ;; Ensure diff-hl draws in fringe, not margin
   (setq diff-hl-draw-borders nil)
   (setq diff-hl-margin-mode nil)
-  
+
   ;; Set diff-hl fringe bitmaps (ensure they're visible)
   (setq diff-hl-fringe-bmp-function 'diff-hl-fringe-bmp-from-type)
-  
+
   ;; Enable flydiff for real-time updates using VC
   (diff-hl-flydiff-mode 1)
-  
+
   ;; Update immediately when visiting a file
   (setq diff-hl-flydiff-delay 0.3)
 
@@ -229,12 +229,12 @@
 
   ;; Enable globally
   (global-diff-hl-mode 1)
-  
+
   ;; Explicitly disable Magit integration in base config
   ;; (Magit hooks will only be added when dev-mode is enabled)
   (setq diff-hl-disable-on-remote nil)
 
-  ;; Manual refresh command  
+  ;; Manual refresh command
   (defun diff-hl-refresh ()
     "Manually refresh diff-hl indicators in all buffers."
     (interactive)
@@ -242,7 +242,7 @@
       (with-current-buffer buf
         (when diff-hl-mode
           (diff-hl-update)))))
-  
+
   ;; Troubleshooting function
   (defun diff-hl-diagnose ()
     "Diagnose diff-hl issues."
@@ -261,7 +261,7 @@
       (push (format "diff-hl-reference-revision: %s" diff-hl-reference-revision) diagnosis)
       (push (format "Magit loaded: %s" (if (fboundp 'magit-status) "yes" "no")) diagnosis)
       (message (mapconcat 'identity (nreverse diagnosis) "\n"))))
-  
+
   ;; Force VC to refresh its state
   (defun diff-hl-force-vc-refresh ()
     "Force VC to refresh state and then update diff-hl."
@@ -270,7 +270,7 @@
       (vc-refresh-state)
       (diff-hl-update)
       (message "VC state refreshed and diff-hl updated")))
-  
+
   ;; Disable Magit integration if causing issues
   (defun diff-hl-disable-magit ()
     "Disable Magit integration with diff-hl."
@@ -279,7 +279,7 @@
     (remove-hook 'magit-pre-refresh-hook 'diff-hl-magit-pre-refresh)
     (remove-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
     (message "Magit integration with diff-hl disabled. Using pure VC backend."))
-  
+
   ;; Ensure we're using VC backend
   (defun diff-hl-ensure-vc-backend ()
     "Ensure diff-hl is using VC backend."
@@ -708,6 +708,13 @@
     (when (file-exists-p elfeed-config)
       (load-file elfeed-config)))
 
+  ;; Reload mu4e config if it exists
+  (let ((mu4e-config (expand-file-name "mu4e-config.el" user-emacs-directory)))
+    (when (file-exists-p mu4e-config)
+      (condition-case err
+          (load-file mu4e-config)
+        (error
+         (message "mu4e config available but mu4e not installed")))))
 
   (message "Emacs configuration fully reloaded!"))
 
@@ -721,6 +728,16 @@
   (when (file-exists-p elfeed-config)
     (load-file elfeed-config)
     (message "Elfeed RSS reader configuration loaded.")))
+
+;;; Email Configuration (mu4e)
+(let ((mu4e-config (expand-file-name "mu4e-config.el" user-emacs-directory)))
+  (when (file-exists-p mu4e-config)
+    (condition-case err
+        (progn
+          (load-file mu4e-config)
+          (message "mu4e email configuration loaded."))
+      (error
+       (message "mu4e configuration available but mu4e not installed. Install mu4e package to enable email.")))))
 
 ;;; Development Mode Information
 (defun show-dev-mode-info ()
