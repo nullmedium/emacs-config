@@ -79,15 +79,19 @@
  '(neo-show-hidden-files t)
  '(neo-window-width 40)
  '(package-selected-packages
-   '(all-the-icons all-the-icons-dired anzu avy clang-format+ commenter
-                   cyberpunk-theme dash deadgrep diff-hl diredfl f
-                   grip-mode helm helm-projectile helm-xref ht hydra
-                   ibuffer-projectile ibuffer-sidebar lv magit
-                   magit-delta markdown-mode markdown-toc modus-themes
-                   neotree obsidian olivetti org projectile ripgrep s
-                   spinner treemacs treemacs-all-the-icons
+   '(all-the-icons all-the-icons-dired anzu avy clang-format
+                   clang-format+ commenter company company-box
+                   company-qml cyberpunk-theme dap-mode dash deadgrep
+                   diff-hl diredfl expand-region f flycheck ggtags
+                   grip-mode helm helm-lsp helm-projectile helm-xref
+                   hl-todo ht hydra ibuffer-projectile ibuffer-sidebar
+                   lsp-mode lsp-treemacs lsp-ui lv magit magit-delta
+                   markdown-mode markdown-toc modus-themes
+                   multiple-cursors neotree obsidian olivetti org
+                   origami projectile qml-mode rainbow-delimiters
+                   ripgrep s spinner treemacs treemacs-all-the-icons
                    treemacs-magit treemacs-projectile use-package
-                   wgrep which-key))
+                   wgrep which-key yasnippet))
  '(safe-local-variable-values
    '((company-backends
       (company-qml company-capf company-files company-yasnippet))
@@ -630,6 +634,57 @@
   "Kill the current buffer without confirmation, unless it has unsaved changes."
   (interactive)
   (kill-buffer (current-buffer)))
+
+(defun package-refresh-without-proxy ()
+  "Temporarily disable proxy and refresh packages."
+  (interactive)
+  (let ((url-proxy-services nil))
+    (package-refresh-contents)
+    (message "Package list refreshed without proxy")))
+
+(defun package-install-without-proxy (package)
+  "Install PACKAGE without using proxy."
+  (interactive
+   (list (intern (completing-read "Install package: "
+                                 (mapcar #'car package-archive-contents)))))
+  (let ((url-proxy-services nil))
+    (package-install package)
+    (message "Package %s installed without proxy" package)))
+
+(defun install-dev-packages ()
+  "Install development packages without proxy."
+  (interactive)
+  (let ((url-proxy-services nil)
+        (dev-packages '(lsp-mode lsp-ui lsp-treemacs
+                       company company-box yasnippet
+                       flycheck magit forge)))
+    (package-refresh-contents)
+    (dolist (pkg dev-packages)
+      (unless (package-installed-p pkg)
+        (condition-case err
+            (progn
+              (package-install pkg)
+              (message "Installed %s" pkg))
+          (error
+           (message "Failed to install %s: %s" pkg err)))))
+    (message "Development packages installation complete")))
+
+(defvar url-proxy-services-backup nil
+  "Backup of proxy settings.")
+
+(defun toggle-proxy ()
+  "Toggle proxy settings on/off."
+  (interactive)
+  (if url-proxy-services
+      (progn
+        (setq url-proxy-services-backup url-proxy-services)
+        (setq url-proxy-services nil)
+        (message "Proxy disabled"))
+    (progn
+      (setq url-proxy-services (or url-proxy-services-backup
+                                   '(("https" . "eudewerepo001:3128")
+                                     ("http" . "eudewerepo001:3128"))))
+      (message "Proxy enabled: %s" (cdr (assoc "http" url-proxy-services))))))
 
 (defun reload-emacs-config ()
   "Reload the Emacs configuration file and all dependent configs."
