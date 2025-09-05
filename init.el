@@ -92,15 +92,16 @@
                    clang-format+ commenter company company-box
                    company-qml cyberpunk-theme dap-mode dash deadgrep
                    diff-hl diredfl expand-region f flycheck ggtags
-                   grip-mode helm helm-lsp helm-projectile helm-xref
-                   hl-todo ht hydra ibuffer-projectile ibuffer-sidebar
-                   lsp-mode lsp-treemacs lsp-ui lv magit magit-delta
-                   markdown-mode markdown-toc modus-themes
-                   multiple-cursors neotree obsidian olivetti org
-                   origami projectile qml-mode rainbow-delimiters
-                   ripgrep s spinner treemacs treemacs-all-the-icons
-                   treemacs-magit treemacs-projectile use-package
-                   wgrep which-key yasnippet))
+                   god-mode grip-mode helm helm-lsp helm-projectile
+                   helm-xref hl-todo ht hydra ibuffer-projectile
+                   ibuffer-sidebar lsp-mode lsp-treemacs lsp-ui lv
+                   magit magit-delta markdown-mode markdown-toc
+                   modus-themes multiple-cursors neotree obsidian
+                   olivetti org origami projectile qml-mode
+                   rainbow-delimiters ripgrep s spinner treemacs
+                   treemacs-all-the-icons treemacs-magit
+                   treemacs-projectile use-package wgrep which-key
+                   yasnippet))
  '(safe-local-variable-values
    '((company-backends
       (company-qml company-capf company-files company-yasnippet))
