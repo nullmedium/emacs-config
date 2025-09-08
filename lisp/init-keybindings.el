@@ -52,5 +52,14 @@ With argument ARG, make ARG copies."
 
 (global-set-key (kbd "C-c b") 'switch-to-previous-buffer)
 
+;;; Alt-Tab style buffer cycling
+;; Cycle through buffers with M-Tab (Alt-Tab)
+(global-set-key (kbd "M-<tab>") 'next-buffer)
+(global-set-key (kbd "M-S-<tab>") 'previous-buffer)
+
+;; Alternative: Use C-Tab if M-Tab is captured by window manager
+(global-set-key (kbd "C-<tab>") 'next-buffer)
+(global-set-key (kbd "C-S-<tab>") 'previous-buffer)
+
 (provide 'init-keybindings)
 ;;; init-keybindings.el ends here

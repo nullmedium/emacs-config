@@ -40,23 +40,29 @@
               (local-set-key (kbd "C-c C-n") 'eat-next-shell-prompt)))
   
   ;; Auto-close on exit codes
-  (defun eat-close-on-exit ()
-    "Close eat buffer automatically when shell exits."
-    (when (and (eq major-mode 'eat-mode)
-               (not (process-live-p (get-buffer-process (current-buffer)))))
-      (kill-buffer)))
+  (defun eat-close-on-exit (process event)
+    "Close eat buffer automatically when shell exits.
+PROCESS is the eat process, EVENT is the exit event string."
+    (when (and (string-match-p "\\(finished\\|exited\\)" event)
+               (buffer-live-p (process-buffer process)))
+      (with-current-buffer (process-buffer process)
+        (when (eq major-mode 'eat-mode)
+          (kill-buffer)))))
   
   ;; Add hook to close buffer when process exits
   (add-hook 'eat-exit-hook 'eat-close-on-exit)
   
   ;; Alternative: Close with a delay to see exit message
-  (defun eat-close-on-exit-with-delay ()
-    "Close eat buffer with a small delay after exit."
-    (run-with-timer 0.5 nil
-                    (lambda (buf)
-                      (when (buffer-live-p buf)
-                        (kill-buffer buf)))
-                    (current-buffer)))
+  (defun eat-close-on-exit-with-delay (process event)
+    "Close eat buffer with a small delay after exit.
+PROCESS is the eat process, EVENT is the exit event string."
+    (when (and (string-match-p "\\(finished\\|exited\\)" event)
+               (buffer-live-p (process-buffer process)))
+      (run-with-timer 0.5 nil
+                      (lambda (buf)
+                        (when (buffer-live-p buf)
+                          (kill-buffer buf)))
+                      (process-buffer process))))
   
   ;; Uncomment this and comment the previous hook if you want a delay
   ;; (add-hook 'eat-exit-hook 'eat-close-on-exit-with-delay)

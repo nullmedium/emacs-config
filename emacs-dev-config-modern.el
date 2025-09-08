@@ -164,11 +164,11 @@
     :ensure t
     :hook (prog-mode . origami-mode)
     :bind (:map origami-mode-map
-                ("C-c f f" . origami-toggle-node)
-                ("C-c f o" . origami-open-node)
-                ("C-c f c" . origami-close-node)
-                ("C-c f a" . origami-close-all-nodes)
-                ("C-c f A" . origami-open-all-nodes))))
+                ("C-c o f" . origami-toggle-node)
+                ("C-c o o" . origami-open-node)
+                ("C-c o c" . origami-close-node)
+                ("C-c o a" . origami-close-all-nodes)
+                ("C-c o A" . origami-open-all-nodes))))
 
 (defun dev-mode-modern-setup-keybindings ()
   "Setup development-specific keybindings."

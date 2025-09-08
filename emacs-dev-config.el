@@ -153,20 +153,20 @@
   (use-package origami
     :ensure t
     :config
-    ;; Define global keybindings for origami
-    (global-set-key (kbd "C-c f f") 'origami-toggle-node)
-    (global-set-key (kbd "C-c f o") 'origami-open-node)
-    (global-set-key (kbd "C-c f c") 'origami-close-node)
-    (global-set-key (kbd "C-c f a") 'origami-close-all-nodes)
-    (global-set-key (kbd "C-c f A") 'origami-open-all-nodes)
-    (global-set-key (kbd "C-c f t") 'origami-toggle-all-nodes)
-    (global-set-key (kbd "C-c f r") 'origami-recursively-toggle-node)
-    (global-set-key (kbd "C-c f R") 'origami-open-node-recursively)
-    (global-set-key (kbd "C-c f n") 'origami-next-fold)
-    (global-set-key (kbd "C-c f p") 'origami-previous-fold)
-    (global-set-key (kbd "C-c f s") 'origami-show-only-node)
-    (global-set-key (kbd "C-c f u") 'origami-undo)
-    (global-set-key (kbd "C-c f d") 'origami-redo)
+    ;; Define global keybindings for origami (using C-c o prefix to avoid conflict)
+    (global-set-key (kbd "C-c o f") 'origami-toggle-node)
+    (global-set-key (kbd "C-c o o") 'origami-open-node)
+    (global-set-key (kbd "C-c o c") 'origami-close-node)
+    (global-set-key (kbd "C-c o a") 'origami-close-all-nodes)
+    (global-set-key (kbd "C-c o A") 'origami-open-all-nodes)
+    (global-set-key (kbd "C-c o t") 'origami-toggle-all-nodes)
+    (global-set-key (kbd "C-c o r") 'origami-recursively-toggle-node)
+    (global-set-key (kbd "C-c o R") 'origami-open-node-recursively)
+    (global-set-key (kbd "C-c o n") 'origami-next-fold)
+    (global-set-key (kbd "C-c o p") 'origami-previous-fold)
+    (global-set-key (kbd "C-c o s") 'origami-show-only-node)
+    (global-set-key (kbd "C-c o u") 'origami-undo)
+    (global-set-key (kbd "C-c o d") 'origami-redo)
     
     ;; Setup origami
     (setq origami-show-fold-header t)
@@ -197,8 +197,8 @@
            ("C-S-d" . mc/mark-all-like-this)
            ("C->" . mc/mark-next-like-this)
            ("C-<" . mc/mark-previous-like-this)
-           ("C-c m n" . mc/skip-to-next-like-this)
-           ("C-c m p" . mc/skip-to-previous-like-this)
+           ("C-c M n" . mc/skip-to-next-like-this)
+           ("C-c M p" . mc/skip-to-previous-like-this)
            ("C-S-<mouse-1>" . mc/add-cursor-on-click)))
 
   (use-package expand-region
