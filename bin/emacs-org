@@ -1,0 +1,20 @@
+#!/bin/bash
+# Launch Emacs in terminal mode with Org mode
+# Accepts optional org file argument
+
+if [ $# -eq 0 ]; then
+    # No arguments, start with org-agenda
+    EMACS_NO_DESKTOP=1 emacs -nw --eval "(progn
+      (require 'org)
+      (org-agenda))"
+else
+    # Open specified org file
+    if [ -f "$1" ]; then
+        EMACS_NO_DESKTOP=1 emacs -nw "$1" --eval "(org-mode)"
+    else
+        # Create new org file
+        EMACS_NO_DESKTOP=1 emacs -nw "$1" --eval "(progn
+          (org-mode)
+          (insert \"#+TITLE: $(basename \"$1\" .org)\n#+DATE: $(date +%Y-%m-%d)\n\n\"))"
+    fi
+fi

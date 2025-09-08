@@ -1,0 +1,22 @@
+#!/bin/bash
+# Launch Emacs in terminal mode with built-in terminal emulator
+# Accepts optional shell command argument
+
+if [ $# -eq 0 ]; then
+    # No arguments, start default shell
+    EMACS_NO_DESKTOP=1 emacs -nw --eval "(progn
+      (if (fboundp 'vterm)
+          (vterm)
+        (if (fboundp 'term)
+            (term (getenv \"SHELL\"))
+          (eshell))))"
+else
+    # Run specified command
+    CMD="$*"
+    EMACS_NO_DESKTOP=1 emacs -nw --eval "(progn
+      (if (fboundp 'vterm)
+          (vterm)
+        (if (fboundp 'term)
+            (term \"$CMD\")
+          (eshell))))"
+fi

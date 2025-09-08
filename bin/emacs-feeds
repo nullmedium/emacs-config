@@ -1,0 +1,7 @@
+#!/bin/bash
+# Launch Emacs in terminal mode with Elfeed RSS reader
+
+EMACS_NO_DESKTOP=1 emacs -nw --eval "(progn
+  (require 'elfeed nil t)
+  (elfeed)
+  (elfeed-update))"

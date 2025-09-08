@@ -1,0 +1,5 @@
+#!/bin/bash
+# Launch Emacs in terminal mode with minimal startup (quick mode)
+# Useful for quick edits without loading full configuration
+
+emacs -nw -Q "$@"

@@ -1,0 +1,6 @@
+#!/bin/bash
+# Launch Emacs in terminal mode with portfolio tracker
+
+EMACS_NO_DESKTOP=1 emacs -nw --eval "(progn
+  (when (fboundp 'portfolio-tracker)
+    (portfolio-tracker)))"

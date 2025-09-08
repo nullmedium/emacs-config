@@ -1,0 +1,6 @@
+#!/bin/bash
+# Launch Emacs in terminal mode with mu4e email client
+
+EMACS_NO_DESKTOP=1 emacs -nw --eval "(progn
+  (require 'mu4e nil t)
+  (mu4e))"

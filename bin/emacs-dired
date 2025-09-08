@@ -1,0 +1,17 @@
+#!/bin/bash
+# Launch Emacs in terminal mode with Dired file manager
+# Accepts optional directory argument
+
+if [ $# -eq 0 ]; then
+    # No arguments, use current directory
+    EMACS_NO_DESKTOP=1 emacs -nw --eval "(dired \".\")"
+else
+    # Use specified directory
+    if [ -d "$1" ]; then
+        DIR=$(realpath "$1")
+        EMACS_NO_DESKTOP=1 emacs -nw --eval "(dired \"$DIR\")"
+    else
+        echo "Error: $1 is not a directory"
+        exit 1
+    fi
+fi

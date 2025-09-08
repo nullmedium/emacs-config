@@ -1,0 +1,19 @@
+#!/bin/bash
+# Launch Emacs in terminal mode with development environment
+# Accepts optional file/directory argument
+
+if [ $# -eq 0 ]; then
+    # No arguments, just start with dev mode
+    EMACS_NO_DESKTOP=1 emacs -nw --eval "(progn
+      (when (fboundp 'enable-dev-mode-modern)
+        (enable-dev-mode-modern))
+      (when (fboundp 'treemacs)
+        (treemacs)))"
+else
+    # Open specified file/directory
+    EMACS_NO_DESKTOP=1 emacs -nw "$@" --eval "(progn
+      (when (fboundp 'enable-dev-mode-modern)
+        (enable-dev-mode-modern))
+      (when (fboundp 'treemacs)
+        (treemacs)))"
+fi

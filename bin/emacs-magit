@@ -1,0 +1,29 @@
+#!/bin/bash
+# Launch Emacs in terminal mode with Magit git interface
+# Accepts optional repository path argument
+
+if [ $# -eq 0 ]; then
+    # No arguments, use current directory
+    EMACS_NO_DESKTOP=1 emacs -nw --eval "(progn
+      (require 'package)
+      (package-initialize)
+      (unless (package-installed-p 'magit)
+        (package-refresh-contents)
+        (package-install 'magit))
+      (require 'magit)
+      (magit-status))"
+else
+    # Use specified directory
+    cd "$1" 2>/dev/null || {
+        echo "Error: Cannot access directory $1"
+        exit 1
+    }
+    EMACS_NO_DESKTOP=1 emacs -nw --eval "(progn
+      (require 'package)
+      (package-initialize)
+      (unless (package-installed-p 'magit)
+        (package-refresh-contents)
+        (package-install 'magit))
+      (require 'magit)
+      (magit-status))"
+fi

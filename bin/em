@@ -1,0 +1,85 @@
+#!/bin/bash
+# Main Emacs launcher with mode selection
+# Usage: em [mode] [args...]
+
+SCRIPT_DIR="$(dirname "$0")"
+
+show_help() {
+    cat << EOF
+Emacs Terminal Mode Launcher
+
+Usage: em [mode] [args...]
+
+Available modes:
+  mail      - Launch mu4e email client
+  feeds     - Launch Elfeed RSS reader
+  dev       - Launch development environment with Treemacs
+  magit     - Launch Magit git interface
+  compare   - Compare two files with ediff
+  dired     - Launch Dired file manager
+  portfolio - Launch portfolio tracker
+  org       - Launch Org mode
+  terminal  - Launch terminal emulator in Emacs
+  quick     - Quick mode without config (emacs -Q)
+  help      - Show this help message
+
+Without mode argument, launches standard Emacs in terminal.
+
+Examples:
+  em                    # Launch standard Emacs
+  em mail               # Launch email client
+  em dev myproject/     # Open project in dev mode
+  em compare f1.txt f2.txt  # Compare two files
+  em magit /path/to/repo    # Open Magit in specific repo
+
+EOF
+}
+
+if [ $# -eq 0 ]; then
+    # No arguments, launch standard emacs
+    emacs -nw
+    exit 0
+fi
+
+MODE=$1
+shift
+
+case "$MODE" in
+    mail)
+        exec "$SCRIPT_DIR/emacs-mail" "$@"
+        ;;
+    feeds)
+        exec "$SCRIPT_DIR/emacs-feeds" "$@"
+        ;;
+    dev)
+        exec "$SCRIPT_DIR/emacs-dev" "$@"
+        ;;
+    magit)
+        exec "$SCRIPT_DIR/emacs-magit" "$@"
+        ;;
+    compare)
+        exec "$SCRIPT_DIR/emacs-compare" "$@"
+        ;;
+    dired)
+        exec "$SCRIPT_DIR/emacs-dired" "$@"
+        ;;
+    portfolio)
+        exec "$SCRIPT_DIR/emacs-portfolio" "$@"
+        ;;
+    org)
+        exec "$SCRIPT_DIR/emacs-org" "$@"
+        ;;
+    terminal)
+        exec "$SCRIPT_DIR/emacs-terminal" "$@"
+        ;;
+    quick)
+        exec "$SCRIPT_DIR/emacs-quick" "$@"
+        ;;
+    help|--help|-h)
+        show_help
+        ;;
+    *)
+        # Unknown mode, treat as file argument
+        emacs -nw "$MODE" "$@"
+        ;;
+esac

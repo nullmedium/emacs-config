@@ -1,0 +1,25 @@
+#!/bin/bash
+# Launch Emacs in terminal mode for file comparison (ediff)
+# Usage: emacs-compare file1 file2
+
+if [ $# -ne 2 ]; then
+    echo "Usage: $0 file1 file2"
+    echo "Compare two files using Emacs ediff"
+    exit 1
+fi
+
+if [ ! -f "$1" ]; then
+    echo "Error: File $1 does not exist"
+    exit 1
+fi
+
+if [ ! -f "$2" ]; then
+    echo "Error: File $2 does not exist"
+    exit 1
+fi
+
+FILE1=$(realpath "$1")
+FILE2=$(realpath "$2")
+
+EMACS_NO_DESKTOP=1 emacs -nw --eval "(progn
+  (ediff-files \"$FILE1\" \"$FILE2\"))"

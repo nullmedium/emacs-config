@@ -133,21 +133,23 @@
 (setq desktop-lazy-verbose nil)
 (setq desktop-lazy-idle-delay 1)  ; Restore rest after 1 second idle
 
-;; Enable desktop-save-mode after startup
+;; Enable desktop-save-mode after startup (unless disabled via environment)
 (add-hook 'after-init-hook
           (lambda ()
-            (desktop-save-mode 1)
-            (setq desktop-save t)
-            (setq desktop-auto-save-timeout 300)
-            (setq desktop-path '("~/.emacs.d/"))
-            (setq desktop-dirname "~/.emacs.d/")
-            (setq desktop-base-file-name "emacs-desktop")
-            (setq desktop-restore-frames t)
-            ;; Load desktop after a delay
-            (run-with-idle-timer 2 nil
-                                 (lambda ()
-                                   (desktop-read)
-                                   (message "Desktop restored")))))
+            ;; Check if desktop mode should be disabled (for helper scripts)
+            (unless (getenv "EMACS_NO_DESKTOP")
+              (desktop-save-mode 1)
+              (setq desktop-save t)
+              (setq desktop-auto-save-timeout 300)
+              (setq desktop-path '("~/.emacs.d/"))
+              (setq desktop-dirname "~/.emacs.d/")
+              (setq desktop-base-file-name "emacs-desktop")
+              (setq desktop-restore-frames t)
+              ;; Load desktop after a delay
+              (run-with-idle-timer 2 nil
+                                   (lambda ()
+                                     (desktop-read)
+                                     (message "Desktop restored"))))))
 
 (provide 'init-core)
 ;;; init-core.el ends here
