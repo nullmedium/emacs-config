@@ -45,6 +45,9 @@
         elfeed elfeed-org
 
         ;; Email (mu4e installed separately)
+
+        ;; Finance tracking
+        beancount
         ))
 
 ;; Auto-install missing packages
@@ -102,6 +105,7 @@
                    treemacs-all-the-icons treemacs-magit
                    treemacs-projectile use-package wgrep which-key
                    yasnippet))
+ '(ring-bell-function 'ignore)
  '(safe-local-variable-values
    '((company-backends
       (company-qml company-capf company-files company-yasnippet))
@@ -125,7 +129,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:family "0xProto Nerd Font" :foundry "0x  " :slant normal :weight regular :height 120 :width normal))))
+ '(default ((t (:family "0xProto Nerd Font Mono" :foundry "nil" :slant normal :weight regular :height 140 :width normal))))
  '(diff-hl-change ((t (:background "blue3" :foreground "blue3"))))
  '(diff-hl-delete ((t (:background "red3" :foreground "red3"))))
  '(diff-hl-insert ((t (:background "green3" :foreground "green3")))))
@@ -467,7 +471,8 @@
   (setq dired-dwim-target t)  ; Guess target directory
   (setq dired-recursive-copies 'always)
   (setq dired-recursive-deletes 'always)
-  (setq dired-listing-switches "-alh --group-directories-first")
+  ;; Use macOS-compatible ls options (no --group-directories-first)
+  (setq dired-listing-switches "-alh")
 
   ;; Enable multiple file marking with mouse
   (define-key dired-mode-map (kbd "<mouse-2>") 'dired-find-file)
@@ -627,8 +632,10 @@
 (global-hl-line-mode 1)
 
 ;; Use system ls for better performance and features
-(setq ls-lisp-use-insert-directory-program t)  ; Use system's ls command
-(setq insert-directory-program "ls")  ; Explicitly set to use ls
+;; Use ls-lisp (Emacs's built-in ls emulation) for better cross-platform compatibility
+;; This avoids issues with macOS ls not supporting GNU ls options
+(setq ls-lisp-use-insert-directory-program nil)  ; Use Emacs's ls-lisp instead of system ls
+(setq ls-lisp-dirs-first t)  ; Group directories first (already set in custom-variables)
 
 ;; Auto-save and backup settings
 (setq backup-directory-alist '(("." . "~/.emacs.d/backups")))
@@ -707,6 +714,11 @@
     (when (file-exists-p dev-config)
       (load-file dev-config)))
 
+  ;; Reload SHR config if it exists
+  (let ((shr-config (expand-file-name "shr-config.el" user-emacs-directory)))
+    (when (file-exists-p shr-config)
+      (load-file shr-config)))
+
   ;; Reload elfeed config if it exists
   (let ((elfeed-config (expand-file-name "elfeed-config.el" user-emacs-directory)))
     (when (file-exists-p elfeed-config)
@@ -727,6 +739,22 @@
 (global-set-key (kbd "C-c C-r") 'reload-emacs-config)
 (global-set-key (kbd "C-x C-b") 'helm-buffers-list)
 
+;;; Fix for keybinding conflicts with CUA mode
+(let ((keybinding-fix (expand-file-name "keybinding-fix.el" user-emacs-directory)))
+  (when (file-exists-p keybinding-fix)
+    (load-file keybinding-fix)
+    ;; Automatically apply fixes for special modes
+    (fix-elfeed-keybindings)
+    (fix-portfolio-tracker-keybindings)
+    (disable-cua-in-special-modes)
+    (message "Keybinding fixes loaded and applied.")))
+
+;;; SHR Configuration (for HTML rendering in mu4e, elfeed, eww)
+(let ((shr-config (expand-file-name "shr-config.el" user-emacs-directory)))
+  (when (file-exists-p shr-config)
+    (load-file shr-config)
+    (message "SHR configuration loaded.")))
+
 ;;; RSS Reader Configuration (Elfeed)
 (let ((elfeed-config (expand-file-name "elfeed-config.el" user-emacs-directory)))
   (when (file-exists-p elfeed-config)
@@ -742,6 +770,27 @@
           (message "mu4e email configuration loaded."))
       (error
        (message "mu4e configuration available but mu4e not installed. Install mu4e package to enable email.")))))
+
+;;; Beancount Configuration
+(let ((beancount-config (expand-file-name "beancount-config.el" user-emacs-directory)))
+  (when (file-exists-p beancount-config)
+    (load-file beancount-config)
+    (message "Beancount portfolio tracking configuration loaded.")))
+
+;;; Portfolio Tracker Configuration
+(with-eval-after-load 'tabulated-list
+  (let ((portfolio-tracker (expand-file-name "portfolio-tracker-v2.el" user-emacs-directory)))
+    (when (file-exists-p portfolio-tracker)
+      (load-file portfolio-tracker)
+      (message "Portfolio tracker with live prices loaded."))))
+
+;; Optional: Set default portfolio file to load on startup
+(defvar portfolio-tracker-default-file
+  (expand-file-name "sample-portfolio-v2.el" user-emacs-directory)
+  "Default portfolio file to load.")
+
+;; Keybinding for quick access to portfolio tracker
+(global-set-key (kbd "C-c $") 'portfolio-tracker)
 
 ;;; Theme Management
 (defun load-jens-dark-theme ()
