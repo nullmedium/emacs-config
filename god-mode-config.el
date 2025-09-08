@@ -15,11 +15,13 @@
          ("C-x C-3" . split-window-right)
          ("C-x C-0" . delete-window))
   :config
-  ;; Define keybindings after god-mode is loaded
-  (define-key god-local-mode-map (kbd ".") 'repeat)
-  (define-key god-local-mode-map (kbd "[") 'backward-paragraph)
-  (define-key god-local-mode-map (kbd "]") 'forward-paragraph)
-  (define-key god-local-mode-map (kbd "i") 'god-mode-all)
+  ;; Define keybindings after god-mode is loaded and map exists
+  (with-eval-after-load 'god-mode
+    (when (boundp 'god-local-mode-map)
+      (define-key god-local-mode-map (kbd ".") 'repeat)
+      (define-key god-local-mode-map (kbd "[") 'backward-paragraph)
+      (define-key god-local-mode-map (kbd "]") 'forward-paragraph)
+      (define-key god-local-mode-map (kbd "i") 'god-mode-all)))
   ;; Update cursor to indicate god-mode state
   (defun god-mode-update-cursor ()
     "Update cursor style based on god-mode state."

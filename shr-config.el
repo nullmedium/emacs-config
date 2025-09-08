@@ -49,6 +49,19 @@
   
   (add-hook 'shr-after-render-hook 'my-shr-apply-serif-font))
 
+;; Disable the fill-column indicator (red margin line) in SHR-related modes
+(defun disable-fill-column-indicator ()
+  "Disable the fill column indicator in the current buffer."
+  (display-fill-column-indicator-mode -1))
+
+;; Add hooks to disable fill-column indicator in SHR-using modes
+(add-hook 'eww-mode-hook 'disable-fill-column-indicator)
+(add-hook 'elfeed-show-mode-hook 'disable-fill-column-indicator)
+(add-hook 'mu4e-view-mode-hook 'disable-fill-column-indicator)
+
+;; Also disable it after SHR renders content
+(add-hook 'shr-after-render-hook 'disable-fill-column-indicator)
+
 ;; Disable line numbers in all modes that use SHR
 (defun my-shr-disable-line-numbers ()
   "Disable line numbers in SHR-rendered buffers."

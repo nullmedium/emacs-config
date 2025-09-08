@@ -359,10 +359,19 @@
           (message "Patch saved to %s" file)
         (error "Failed to save patch"))))
 
+  ;; Set up keybindings for saving patches
   (with-eval-after-load 'magit
     (define-key magit-revision-mode-map (kbd "C-c C-p") 'magit-save-commit-as-patch)
     (define-key magit-log-mode-map (kbd "C-c C-p") 'magit-save-commit-as-patch)
     (define-key magit-log-select-mode-map (kbd "C-c C-p") 'magit-save-commit-as-patch))
+  
+  ;; Also set up hooks to ensure keybindings are available
+  (add-hook 'magit-revision-mode-hook
+            (lambda () (local-set-key (kbd "C-c C-p") 'magit-save-commit-as-patch)))
+  (add-hook 'magit-log-mode-hook
+            (lambda () (local-set-key (kbd "C-c C-p") 'magit-save-commit-as-patch)))
+  (add-hook 'magit-log-select-mode-hook
+            (lambda () (local-set-key (kbd "C-c C-p") 'magit-save-commit-as-patch)))
   
   ;; Optional: Integrate diff-hl with Magit when both are available
   ;; Only enable if you want Magit to control diff-hl updates
