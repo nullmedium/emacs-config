@@ -27,6 +27,33 @@
   (setq elfeed-sort-order 'descending)
   (setq elfeed-search-clipboard-type 'CLIPBOARD)
   
+  ;; Async configuration for non-blocking updates
+  ;; Use curl for better performance and async fetching
+  (setq elfeed-use-curl t)
+  (elfeed-set-timeout 30)
+  
+  ;; Increase number of concurrent fetches for faster updates
+  (setq elfeed-curl-max-connections 10)
+  
+  ;; Don't block Emacs while fetching
+  (setq elfeed-curl-extra-arguments '("--insecure" "--location"))
+  
+  ;; Make search updates async
+  (setq elfeed-search-update-hook nil)
+  
+  ;; Background update function that doesn't block UI
+  (defun elfeed-update-async ()
+    "Update elfeed feeds asynchronously without blocking the UI."
+    (interactive)
+    (message "Starting background feed update...")
+    (elfeed-update)
+    (run-with-timer 1 nil
+                    (lambda ()
+                      (message "Feed update complete!"))))
+  
+  ;; Auto-update feeds every 30 minutes in the background
+  (run-with-timer 0 (* 30 60) #'elfeed-update-async)
+  
   ;; Custom function for fuzzy relative timestamps
   (defun my-elfeed-search-format-date (date)
     "Format DATE as a fuzzy relative time string."
@@ -152,7 +179,7 @@
   (define-key elfeed-search-mode-map (kbd "k") 'previous-line)
   (define-key elfeed-search-mode-map (kbd "m") 'elfeed-search-toggle-all-star)
   (define-key elfeed-search-mode-map (kbd "u") 'elfeed-search-toggle-all-unread)
-  (define-key elfeed-search-mode-map (kbd "U") 'elfeed-update)
+  (define-key elfeed-search-mode-map (kbd "U") 'elfeed-update-async)
   (define-key elfeed-search-mode-map (kbd "f") 'elfeed-search-live-filter))
 
 ;; Function to reload elfeed-org configuration

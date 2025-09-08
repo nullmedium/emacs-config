@@ -9,13 +9,23 @@
 **** [[https://www.sueddeutsche.de/muenchen/rss][Süddeutsche Zeitung - München]]
 **** [[https://www.merkur.de/lokales/muenchen/rssfeed.rdf][Merkur - München]]
 **** [[https://www.tz.de/muenchen/rssfeed.rdf][tz - München]]
-**** [[https://www.br.de/nachrichten/bayern/rss.xml][BR24 - Bayern]]
-**** [[https://www.abendzeitung-muenchen.de/storage/rss/rss/muenchen.xml][Abendzeitung München]]
+**** [[https://www.br.de/nachrichten/bayern/rss][BR24 - Bayern]]
+# **** [[https://www.abendzeitung-muenchen.de/storage/rss/rss/muenchen.xml][Abendzeitung München]] # 404 - site restructured
+
+*** Munich Culture & Events                                 :munich:culture:
+**** [[https://www.muenchen.de/rss/veranstaltungen.xml][München.de Events]]
+# **** [[https://www.in-muenchen.de/rss/veranstaltungen][IN München - Events]] # XML parsing error
+# **** [[https://www.muenchenticket.de/rss/events][München Ticket Events]] # 404 - no RSS feed
+**** [[https://www.museen-in-bayern.de/das-mnm/aktuelles/rss.xml][Bavarian Museums]]
+# **** [[https://www.kultur-muenchen.de/rss/][Kultur München]] # XML parsing error
+**** [[https://www.sueddeutsche.de/kultur/rss][SZ Kultur]]
+**** [[https://www.mucbook.de/feed/][MUCBOOK - München Blog]]
+**** [[https://www.munichfound.com/feed/][Munich Found Magazine]]
 
 *** Germany                                                  :germany:de:
 **** [[https://www.tagesschau.de/index~rss2.xml][Tagesschau]]
 **** [[https://www.spiegel.de/schlagzeilen/index.rss][Der Spiegel]]
-**** [[https://www.zeit.de/index/feed][Die Zeit]]
+**** [[https://newsfeed.zeit.de/index][Die Zeit]]
 **** [[https://www.faz.net/rss/aktuell/][FAZ - Aktuell]]
 **** [[https://www.sueddeutsche.de/rss][Süddeutsche Zeitung]]
 **** [[https://www.heise.de/rss/heise.rdf][Heise News]]
@@ -42,6 +52,28 @@
 **** [[https://www.aljazeera.com/xml/rss/all.xml][Al Jazeera English]]
 **** [[https://www.dw.com/rss/en/top-stories/rss-691][Deutsche Welle - World]]
 
+*** Ukraine Conflict                                      :ukraine:conflict:
+**** [[https://www.kyivpost.com/feed][Kyiv Post]]
+**** [[https://www.pravda.com.ua/eng/rss/][Ukrainska Pravda (English)]]
+**** [[https://www.ukrinform.net/rss/block-lastnews][Ukrinform]]
+**** [[https://www.understandingwar.org/rss-feed][Institute for the Study of War]]
+**** [[https://www.rferl.org/api/z$qimetkiy][Radio Free Europe - Ukraine]]
+**** [[https://www.themoscowtimes.com/rss/news][The Moscow Times]]
+**** [[https://meduza.io/rss2/en][Meduza (English)]]
+**** [[https://www.theguardian.com/world/ukraine/rss][The Guardian - Ukraine]]
+**** [[https://feeds.bbci.co.uk/news/world/europe/rss.xml][BBC - Europe (Ukraine coverage)]]
+
+*** Middle East Conflict                                :middleeast:conflict:
+**** [[https://www.haaretz.com/cmlink/1.628765][Haaretz]]
+**** [[https://www.timesofisrael.com/feed/][Times of Israel]]
+**** [[https://www.jpost.com/rss/rssfeedsfrontpage.aspx][Jerusalem Post]]
+**** [[https://www.972mag.com/feed/][+972 Magazine]]
+**** [[https://www.middleeasteye.net/rss][Middle East Eye]]
+**** [[https://www.al-monitor.com/rss][Al-Monitor]]
+**** [[https://www.theguardian.com/world/middleeast/rss][The Guardian - Middle East]]
+**** [[https://www.thenewhumanitarian.org/rss.xml][The New Humanitarian]]
+**** [[https://www.crisisgroup.org/feed][International Crisis Group]]
+
 ** Technology                                                          :tech:
 
 *** General Tech News                                          :technews:
@@ -49,7 +81,7 @@
 **** [[https://www.theverge.com/rss/index.xml][The Verge]]
 **** [[https://techcrunch.com/feed/][TechCrunch]]
 **** [[https://www.wired.com/feed/rss][Wired]]
-**** [[https://www.anandtech.com/rss][AnandTech]]
+# **** [[https://www.anandtech.com/rss][AnandTech]] # Site closed in 2024
 **** [[https://www.heise.de/developer/rss/news-atom.xml][Heise Developer]]
 **** [[https://www.golem.de/rss.php?feed=RSS2.0][Golem.de]]
 **** [[https://news.ycombinator.com/rss][Hacker News]]
@@ -59,7 +91,7 @@
 **** [[https://opensource.com/feed][Opensource.com]]
 **** [[https://lwn.net/headlines/rss][LWN.net]]
 **** [[https://www.linux.com/feed/][Linux.com]]
-**** [[https://www.linuxtoday.com/feed][Linux Today]]
+**** [[https://www.linuxtoday.com/feed/][Linux Today]]
 **** [[https://itsfoss.com/feed/][It's FOSS]]
 **** [[https://www.phoronix.com/rss.php][Phoronix]]
 **** [[https://www.omgubuntu.co.uk/feed][OMG! Ubuntu!]]
@@ -73,7 +105,7 @@
 **** [[https://www.fluentcpp.com/feed/][Fluent C++]]
 **** [[https://www.cppstories.com/index.xml][C++ Stories]]
 **** [[https://herbsutter.com/feed/][Herb Sutter]]
-**** [[https://blog.tartanllama.xyz/feed.xml][Tartanllama]]
+**** [[https://blog.tartanllama.xyz/rss.xml][Tartanllama]]
 **** [[https://devblogs.microsoft.com/cppblog/feed/][Microsoft C++ Team Blog]]
 **** [[https://www.reddit.com/r/cpp/.rss][Reddit - r/cpp]]
 
@@ -82,16 +114,16 @@
 **** [[https://planet.python.org/rss20.xml][Planet Python]]
 **** [[https://www.python.org/jobs/feed/rss/][Python.org News]]
 **** [[https://pycoders.com/feed][PyCoder's Weekly]]
-**** [[https://www.pythonweekly.com/feed][Python Weekly]]
+# **** [[https://www.pythonweekly.com/feed][Python Weekly]] # XML parsing error
 **** [[https://www.reddit.com/r/Python/.rss][Reddit - r/Python]]
 **** [[https://talkpython.fm/episodes/rss][Talk Python To Me]]
 
 *** Qt                                                               :qt:
 **** [[https://www.qt.io/blog/rss.xml][Qt Blog]]
-**** [[https://planet.qt.io/rss20.xml][Planet Qt]]
-**** [[https://woboq.com/blog/feed][Woboq Blog]]
+# **** [[https://planet.qt.io/rss20.xml][Planet Qt]] # XML parsing error
+**** [[https://woboq.com/blog/rss][Woboq Blog]]
 **** [[https://www.kdab.com/category/blogs/feed/][KDAB Blogs]]
-**** [[https://www.ics.com/blog/feed][ICS Qt Blog]]
+# **** [[https://www.ics.com/blog/feed][ICS Qt Blog]] # 404
 
 *** General Programming                                          :general:
 **** [[https://stackoverflow.blog/feed/][Stack Overflow Blog]]
@@ -108,9 +140,48 @@
 **** [[https://www.darkreading.com/rss.xml][Dark Reading]]
 **** [[https://feeds.feedburner.com/TheHackersNews][The Hacker News]]
 **** [[https://www.bleepingcomputer.com/feed/][BleepingComputer]]
-**** [[https://www.csoonline.com/index.rss][CSO Online]]
-**** [[https://nakedsecurity.sophos.com/feed/][Naked Security]]
+**** [[https://www.csoonline.com/feed/][CSO Online]]
+**** [[https://nakedsecurity.sophos.com/feed][Naked Security]]
 **** [[https://www.heise.de/security/rss/news-atom.xml][Heise Security]]
 **** [[https://www.golem.de/rss.php?feed=RSS2.0&ms=security][Golem Security]]
-**** [[https://www.bsi.bund.de/SiteGlobals/Functions/RSSFeed/RSSNewsfeed/RSSNewsfeed.xml][BSI News]]
+# **** [[https://www.bsi.bund.de/SiteGlobals/Functions/RSSFeed/RSSNewsfeed/RSSNewsfeed.xml][BSI News]] # SSL error
 **** [[https://www.reddit.com/r/netsec/.rss][Reddit - r/netsec]]
+
+** Politics & Analysis                                         :politics:analysis:
+
+*** US Politics Deep Dive                                    :us:longform:
+**** [[https://www.theatlantic.com/feed/channel/politics/][The Atlantic - Politics]]
+**** [[https://www.newyorker.com/feed/news/news-desk][The New Yorker - News Desk]]
+**** [[https://www.nybooks.com/feed/][New York Review of Books]]
+**** [[https://harpers.org/feed/][Harper's Magazine]]
+**** [[https://www.propublica.org/feeds/propublica/main][ProPublica]]
+**** [[https://theintercept.com/feed/?lang=en][The Intercept]]
+**** [[https://www.motherjones.com/feed/][Mother Jones]]
+**** [[https://www.thenation.com/feed/][The Nation]]
+**** [[https://www.vox.com/rss/index.xml][Vox]]
+**** [[https://fivethirtyeight.com/features/feed/][FiveThirtyEight]]
+**** [[https://www.politico.com/rss/magazine.xml][Politico Magazine]]
+
+*** EU/Europe Politics Analysis                          :eu:europe:longform:
+**** [[https://ecfr.eu/feed/][European Council on Foreign Relations]]
+**** [[https://carnegieendowment.org/rss/europe][Carnegie Europe]]
+**** [[https://www.ceps.eu/feed][Centre for European Policy Studies]]
+**** [[https://www.cer.eu/insights/rss.xml][Centre for European Reform]]
+**** [[https://www.bruegel.org/feed][Bruegel]]
+**** [[https://www.chathamhouse.org/feeds/all.rss][Chatham House]]
+**** [[https://www.iiss.org/api/rss/en/rss.xml][IISS - International Institute for Strategic Studies]]
+**** [[https://www.spiegel.de/international/index.rss][Der Spiegel International]]
+**** [[https://www.lemonde.fr/en/rss/une.xml][Le Monde English]]
+
+*** World Politics & Foreign Policy                    :world:longform:policy:
+**** [[https://www.foreignaffairs.com/rss.xml][Foreign Affairs]]
+**** [[https://foreignpolicy.com/feed/][Foreign Policy]]
+**** [[https://www.cfr.org/rss.xml][Council on Foreign Relations]]
+**** [[https://www.brookings.edu/articles/feed/][Brookings Institution]]
+**** [[https://warontherocks.com/feed/][War on the Rocks]]
+**** [[https://thediplomat.com/feed/][The Diplomat]]
+**** [[https://www.rand.org/blog.xml][RAND Corporation Blog]]
+**** [[https://www.wilsoncenter.org/rss-feeds][Wilson Center]]
+**** [[https://www.csis.org/rss.xml][Center for Strategic and International Studies]]
+**** [[https://www.lowyinstitute.org/the-interpreter/rss.xml][Lowy Institute - The Interpreter]]
+**** [[https://www.project-syndicate.org/rss][Project Syndicate]]
