@@ -38,6 +38,7 @@
 (window-divider-mode 1)
 
 ;;; Font Settings (preserved from custom-set-faces)
+;; Apply font settings to all frames (current and future)
 (set-face-attribute 'default nil
                     :family "0xProto Nerd Font Mono"
                     :foundry "nil"
@@ -45,6 +46,9 @@
                     :weight 'regular
                     :height 140
                     :width 'normal)
+
+;; Ensure font settings apply to new frames
+(add-to-list 'default-frame-alist '(font . "0xProto Nerd Font Mono-14"))
 
 ;;; Diff-hl face customizations
 (with-eval-after-load 'diff-hl
