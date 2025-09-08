@@ -2,7 +2,7 @@
 
 ;; mu4e should already be loaded from .emacs before this file is loaded
 ;; If not loaded, try to load it
-(add-to-list 'load-path "/usr/local/share/emacs/site-lisp/mu4e/")
+(add-to-list 'load-path "/opt/homebrew/Cellar/mu/1.12.12/share/emacs/site-lisp/mu/mu4e")
 (require 'mu4e)
 
 ;; HTML rendering configuration for mu4e 1.12
@@ -15,6 +15,14 @@
 ;; (setq shr-use-fonts nil)         ; No variable fonts
 ;; (setq shr-width 80)              ; 80 column width
 (setq shr-bullet "• ")            ; Nice bullet
+
+;; Increase font size in SHR (HTML rendering)
+(defun my-shr-rescale-font ()
+  "Increase font size in SHR rendered content."
+  (text-scale-set 1))  ; Increase by 1 step, adjust as needed (2, 3, etc.)
+
+;; Apply font scaling to mu4e HTML viewing
+(add-hook 'mu4e-view-mode-hook 'my-shr-rescale-font)
 
 ;; Create a custom command to view HTML with pandoc
 (defun mu4e-view-html-with-pandoc ()
@@ -134,7 +142,7 @@
          :key ?i)
 
         (:name "📰 Newsletters"
-         :query "(from:/newsletter|news|digest|update|weekly|daily|monthly|bulletin|announcement/ OR subject:/newsletter|digest|update|weekly|edition/) AND NOT flag:trashed AND NOT flag:flagged"
+         :query "(from:/nytimes|newyorktimes|atlantic|politico/ OR from:nytimes.com OR from:theatlantic.com OR from:politico.com OR from:politico.eu) AND NOT flag:trashed AND NOT flag:flagged"
          :key ?n)
 
         (:name "🛍️ Purchases & Orders"
@@ -166,7 +174,7 @@
          :query "list:std-discussion.lists.isocpp.org AND NOT flag:trashed"
          :key ?C)
 
-        (:name "📋 Qt Interest"  
+        (:name "📋 Qt Interest"
          :query "list:interest.qt-project.org AND NOT flag:trashed"
          :key ?q)
 
@@ -175,7 +183,7 @@
          :key ?b)
 
         (:name  "📋 GCC"
-         :query "list:gcc.gnu.gcc.org AND NOT flag:trashed"
+         :query "list:gcc.gcc.gnu.org AND NOT flag:trashed"
          :key ?G)
 
         (:name "📋 LKML"
@@ -196,12 +204,47 @@
         ("/IONOS/Drafts"      . ?D)
         ("/IONOS/Archive"     . ?A)))
 
-;; UI Configuration - use default headers for now
-;; (setq mu4e-headers-fields
-;;       '((:human-date . 12)
-;;         (:flags . 6)
-;;         (:from-or-to . 22)
-;;         (:subject)))
+;; Custom function for fuzzy relative timestamps
+(defun my-mu4e-format-date (date)
+  "Format DATE as a fuzzy relative time string."
+  (let* ((now (float-time))
+         (time (float-time date))
+         (diff (- now time))
+         (sec diff)
+         (min (/ diff 60))
+         (hour (/ diff 3600))
+         (day (/ diff 86400))
+         (week (/ diff 604800))
+         (month (/ diff 2592000))
+         (year (/ diff 31536000)))
+    (cond
+     ((< sec 60) "just now")
+     ((< min 2) "1 min ago")
+     ((< min 60) (format "%d mins ago" (truncate min)))
+     ((< hour 2) "1 hour ago")
+     ((< hour 24) (format "%d hours ago" (truncate hour)))
+     ((< day 2) "yesterday")
+     ((< day 7) (format "%d days ago" (truncate day)))
+     ((< week 2) "1 week ago")
+     ((< week 4) (format "%d weeks ago" (truncate week)))
+     ((< month 2) "1 month ago")
+     ((< month 12) (format "%d months ago" (truncate month)))
+     ((< year 2) "1 year ago")
+     (t (format "%d years ago" (truncate year))))))
+
+;; Custom header field for fuzzy date
+(add-to-list 'mu4e-header-info-custom
+             '(:fuzzy-date . (:name "Date"
+                              :shortname "Date"
+                              :function (lambda (msg)
+                                          (my-mu4e-format-date (mu4e-message-field msg :date))))))
+
+;; UI Configuration - use fuzzy dates in headers
+(setq mu4e-headers-fields
+      '((:fuzzy-date . 15)     ; Fuzzy date with 15 char width
+        (:flags . 6)
+        (:from-or-to . 22)
+        (:subject)))
 
 ;; Make mu4e respect the current color theme
 (setq mu4e-view-use-gnus t)  ; Use Gnus article mode for better theme support

@@ -6,6 +6,51 @@
 MAILDIR="$HOME/Maildir"
 ARCHIVE_LISTS=true  # Set to false if you don't want local date-based archives
 
+# Function to fix List-Id headers for SimpleLogin forwarded messages
+fix_list_headers() {
+    echo "Processing mailing list messages to fix List-Id headers..."
+    
+    local count=0
+    local fixed=0
+    
+    # Process all messages in Lists folder and subfolders
+    # This includes both /Personal/Lists/{new,cur} and /Personal/Lists/*/{new,cur}
+    find "$MAILDIR/Personal/Lists" -type f \( -path "*/new/*" -o -path "*/cur/*" \) | while read -r msg; do
+        ((count++))
+        
+        # Check if this message has X-Simplelogin-Original-List-Id but no List-Id
+        if grep -q "^X-Simplelogin-Original-List-Id:" "$msg" 2>/dev/null && ! grep -q "^List-Id:" "$msg" 2>/dev/null; then
+            # Extract the original List-Id value
+            LIST_ID=$(grep "^X-Simplelogin-Original-List-Id:" "$msg" | sed 's/^X-Simplelogin-Original-List-Id: //')
+            
+            if [ -n "$LIST_ID" ]; then
+                # Create a temporary file with the new header
+                TEMP_FILE=$(mktemp)
+                
+                # Add List-Id header after the first occurrence of X-Simplelogin headers
+                awk -v list_id="$LIST_ID" '
+                    !added && /^X-Simplelogin-Original-List-Id:/ {
+                        print "List-Id: " list_id
+                        added = 1
+                    }
+                    { print }
+                ' "$msg" > "$TEMP_FILE"
+                
+                # Replace the original file
+                mv "$TEMP_FILE" "$msg"
+                ((fixed++))
+                
+                # Show progress every 100 messages
+                if [ $((fixed % 100)) -eq 0 ]; then
+                    echo "  Fixed $fixed messages so far..."
+                fi
+            fi
+        fi
+    done
+    
+    echo "  Processed $count messages, fixed $fixed missing List-Id headers"
+}
+
 # Function to create date-based archive of Lists folder
 archive_lists() {
     if [ "$ARCHIVE_LISTS" != "true" ]; then
@@ -84,22 +129,27 @@ if [ $SYNC_STATUS -ne 0 ]; then
     echo "This can be normal if some folders are not yet created on the server."
 fi
 
-# Step 2: Create local archives (optional)
+# Step 2: Fix List-Id headers for SimpleLogin forwarded messages
+echo ""
+echo "Step 2: Fixing List-Id headers for mailing lists..."
+fix_list_headers
+
+# Step 3: Create local archives (optional)
 if [ "$ARCHIVE_LISTS" = "true" ]; then
     echo ""
-    echo "Step 2: Creating local date-based archives..."
+    echo "Step 3: Creating local date-based archives..."
     archive_lists
 else
     echo ""
-    echo "Step 2: Skipping local archives (disabled)"
+    echo "Step 3: Skipping local archives (disabled)"
 fi
 
-# Step 3: Update mu index
+# Step 4: Update mu index
 echo ""
-echo "Step 3: Updating mu index..."
+echo "Step 4: Updating mu index..."
 mu index --quiet
 
-# Step 4: Show summary
+# Step 5: Show summary
 echo ""
 echo "=========================================="
 echo "Mail Processing Complete: $(date)"
