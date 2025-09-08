@@ -11,6 +11,10 @@
 
 ;; EMERGENCY FIX - Load this first to ensure editing works
 (require 'init-emergency-fix)
+(require 'init-seq-fix)  ; Fix seq library issues
+
+;; Load performance optimizations early
+(require 'init-performance)
 
 ;;; Load core modules in order
 (require 'init-core)      ; Core settings and package management

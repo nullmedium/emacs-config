@@ -37,6 +37,18 @@
 (setq window-divider-default-right-width 1)
 (window-divider-mode 1)
 
+;;; X11 optimizations for no-toolkit builds
+(when (and (display-graphic-p)
+           (eq window-system 'x)
+           ;; Check if using no-toolkit build (OLDXMENU present)
+           (string-match-p "OLDXMENU" system-configuration-features))
+  ;; Disable double buffering to fix redraw issues
+  (add-to-list 'default-frame-alist '(inhibit-double-buffering . t))
+  ;; Force synchronous X operations
+  (setq x-gtk-use-system-tooltips nil)
+  ;; More responsive display updates
+  (setq redisplay-dont-pause t))
+
 ;;; Font Settings (preserved from custom-set-faces)
 ;; Apply font settings to all frames (current and future)
 (set-face-attribute 'default nil

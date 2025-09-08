@@ -55,10 +55,11 @@
   (define-key smartparens-mode-map (kbd "C-M-w") 'sp-copy-sexp)
   (define-key smartparens-mode-map (kbd "M-<delete>") 'sp-unwrap-sexp)
   (define-key smartparens-mode-map (kbd "M-<backspace>") 'sp-backward-unwrap-sexp)
-  (define-key smartparens-mode-map (kbd "C-<right>") 'sp-forward-slurp-sexp)
-  (define-key smartparens-mode-map (kbd "C-<left>") 'sp-forward-barf-sexp)
-  (define-key smartparens-mode-map (kbd "C-M-<right>") 'sp-backward-barf-sexp)
-  (define-key smartparens-mode-map (kbd "C-M-<left>") 'sp-backward-slurp-sexp)
+  ;; Changed from C-<left/right> to avoid conflict with word navigation
+  (define-key smartparens-mode-map (kbd "C-c <right>") 'sp-forward-slurp-sexp)
+  (define-key smartparens-mode-map (kbd "C-c <left>") 'sp-forward-barf-sexp)
+  (define-key smartparens-mode-map (kbd "C-c M-<right>") 'sp-backward-barf-sexp)
+  (define-key smartparens-mode-map (kbd "C-c M-<left>") 'sp-backward-slurp-sexp)
   (define-key smartparens-mode-map (kbd "M-D") 'sp-splice-sexp)
   (define-key smartparens-mode-map (kbd "C-]") 'sp-select-next-thing-exchange)
   (define-key smartparens-mode-map (kbd "C-<") 'sp-select-previous-thing)
@@ -156,7 +157,8 @@
 (global-set-key (kbd "C-x |") 'qol-toggle-window-split)
 
 ;;; Window movement with windmove
-(windmove-default-keybindings)  ; Use Shift+arrows to move between windows
+;; Use Meta (Alt) + arrows instead of Shift+arrows to avoid conflicts with shift-selection
+(windmove-default-keybindings 'meta)  ; Use Meta+arrows to move between windows
 (setq windmove-wrap-around t)
 
 ;;; Better buffer names for duplicates

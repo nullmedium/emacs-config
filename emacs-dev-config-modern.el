@@ -125,14 +125,17 @@
   "Configure debugging with dap-mode."
   (use-package dap-mode
     :ensure t
-    :commands dap-debug
+    :commands (dap-debug dap-debug-edit-template)
+    ;; Don't auto-enable - only load when explicitly needed for debugging
     :config
     ;; Python debugging
     (require 'dap-python)
     ;; C/C++ debugging
     (require 'dap-gdb-lldb)
-    ;; Automatic configuration
-    (dap-auto-configure-mode 1)))
+    ;; Don't auto-configure globally - causes severe performance issues
+    ;; Enable manually when debugging: M-x dap-auto-configure-mode
+    ;; (dap-auto-configure-mode 1)  ; Commented out for performance
+    ))
 
 (defun dev-mode-modern-setup-languages ()
   "Configure language-specific settings."
@@ -148,7 +151,8 @@
   (use-package qml-mode
     :ensure t
     :mode "\\.qml\\'"
-    :hook (qml-mode . eglot-ensure)))
+    ;; Removed qml-mode hook - Qt5 has no language server
+    ))
 
 (defun dev-mode-modern-setup-editing-tools ()
   "Setup advanced editing tools for development."

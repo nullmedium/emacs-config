@@ -12,6 +12,18 @@
 (setq shift-select-mode t)
 (transient-mark-mode t)
 
+;; Standard word navigation with C-left/right
+(global-set-key (kbd "C-<left>") 'left-word)
+(global-set-key (kbd "C-<right>") 'right-word)
+
+;; Word selection with C-Shift-left/right
+(global-set-key (kbd "C-S-<left>") 'left-word)
+(global-set-key (kbd "C-S-<right>") 'right-word)
+
+;; Make sure shift-selection works with these commands
+(put 'left-word 'CUA 'move)
+(put 'right-word 'CUA 'move)
+
 ;;; Text manipulation
 (global-set-key (kbd "C-<return>") 'cua-set-rectangle-mark)
 
@@ -40,6 +52,11 @@
   :commands olivetti-mode
   :config
   (setq olivetti-body-width 100))
+
+;;; Rainbow delimiters - colorize matching brackets
+(use-package rainbow-delimiters
+  :ensure t
+  :hook (prog-mode . rainbow-delimiters-mode))
 
 ;;; God-mode configuration (disabled by default)
 ;; Uncomment the following lines to enable god-mode

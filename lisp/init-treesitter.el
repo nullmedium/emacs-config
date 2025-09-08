@@ -83,7 +83,7 @@
   (add-to-list 'auto-mode-alist '("\\.go\\'" . go-ts-mode))
 
   ;; Enhanced font-lock for tree-sitter modes
-  (setq treesit-font-lock-level 4)  ; Maximum highlighting
+  (setq treesit-font-lock-level 3)  ; Balanced highlighting (was 4, reduced for performance)
 
   ;; Tree-sitter debugging helpers
   (defun treesit-inspect-node-at-point ()

@@ -46,7 +46,7 @@
   "Configure LSP mode for development."
   (use-package lsp-mode
     :ensure t
-    :hook ((c-mode c++-mode python-mode qml-mode) . lsp-deferred)
+    :hook ((c-mode c++-mode python-mode) . lsp-deferred)  ; Removed qml-mode - Qt5 has no LSP
     :commands (lsp lsp-deferred)
     :config
     (setq lsp-keymap-prefix "C-c l")
@@ -420,11 +420,13 @@
   "Configure debugging support."
   (use-package dap-mode
     :ensure t
-    :commands dap-debug
+    :commands (dap-debug dap-debug-edit-template)
+    ;; Don't auto-enable - only load when explicitly needed
     :config
     (require 'dap-python)
     (require 'dap-gdb-lldb)
-    (dap-auto-configure-mode 1)
+    ;; Don't auto-configure globally - causes performance issues
+    ;; (dap-auto-configure-mode 1)  ; Commented out for performance
     (setq dap-auto-configure-features '(sessions locals controls tooltip))))
 
 (defun dev-mode-custom-functions ()
