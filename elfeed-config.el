@@ -26,7 +26,71 @@
   ;; Sorting configuration
   (setq elfeed-sort-order 'descending)
   (setq elfeed-search-clipboard-type 'CLIPBOARD)
-  (setq elfeed-search-date-format '("%F %R" 16 :left))
+  
+  ;; Custom function for fuzzy relative timestamps
+  (defun my-elfeed-search-format-date (date)
+    "Format DATE as a fuzzy relative time string."
+    (let* ((now (float-time))
+           (time (float-time date))
+           (diff (- now time))
+           (sec diff)
+           (min (/ diff 60))
+           (hour (/ diff 3600))
+           (day (/ diff 86400))
+           (week (/ diff 604800))
+           (month (/ diff 2592000))
+           (year (/ diff 31536000)))
+      (cond
+       ((< sec 60) "just now")
+       ((< min 2) "1 min ago")
+       ((< min 60) (format "%d mins ago" (truncate min)))
+       ((< hour 2) "1 hour ago")
+       ((< hour 24) (format "%d hours ago" (truncate hour)))
+       ((< day 2) "yesterday")
+       ((< day 7) (format "%d days ago" (truncate day)))
+       ((< week 2) "1 week ago")
+       ((< week 4) (format "%d weeks ago" (truncate week)))
+       ((< month 2) "1 month ago")
+       ((< month 12) (format "%d months ago" (truncate month)))
+       ((< year 2) "1 year ago")
+       (t (format "%d years ago" (truncate year))))))
+  
+  ;; Override the elfeed print function after elfeed loads
+  (with-eval-after-load 'elfeed-search
+    (defun elfeed-search-print-entry--default (entry)
+      "Print ENTRY to the buffer with custom date format."
+      (let* ((date (elfeed-entry-date entry))
+             (date-str (my-elfeed-search-format-date date))
+             (date-str (elfeed-format-column date-str 15 :left))
+             (title (or (elfeed-meta entry :title) (elfeed-entry-title entry) ""))
+             (title-faces (elfeed-search--faces (elfeed-entry-tags entry)))
+             (feed (elfeed-entry-feed entry))
+             (feed-title
+              (when feed
+                (or (elfeed-meta feed :title) (elfeed-feed-title feed))))
+             (tags (mapcar #'symbol-name (elfeed-entry-tags entry)))
+             (tags-str (mapconcat
+                        (lambda (s) (propertize s 'face 'elfeed-search-tag-face))
+                        tags ","))
+             (title-width (- (window-width) 10 elfeed-search-trailing-width 15))
+             (title-column (elfeed-format-column
+                            title (elfeed-clamp
+                                   elfeed-search-title-min-width
+                                   title-width
+                                   elfeed-search-title-max-width)
+                            :left)))
+        (insert (propertize date-str 'face 'elfeed-search-date-face) " ")
+        (insert (propertize title-column 'face title-faces 'kbd-help title) " ")
+        (when feed-title
+          (insert (propertize feed-title 'face 'elfeed-search-feed-face) " "))
+        (when tags
+          (insert "(" tags-str ")"))))
+    
+    ;; Set our custom function as the printer
+    (setq elfeed-search-print-entry-function #'elfeed-search-print-entry--default))
+  
+  ;; Use standard date format (this is just for the column specification)
+  (setq elfeed-search-date-format '("%Y-%m-%d" 15 :left))
   
   ;; Face customization for different tags
   (defface elfeed-face-tag-news
@@ -60,13 +124,27 @@
 (use-package elfeed-org
   :ensure t
   :after elfeed
+  :init
+  ;; Ensure elfeed-feeds variable exists
+  (defvar elfeed-feeds nil)
   :config
   ;; Load feeds from org file
   (setq rmh-elfeed-org-files (list (expand-file-name "elfeed.org" user-emacs-directory)))
-  (elfeed-org))
+  ;; Initialize elfeed-org properly
+  (elfeed-org)
+  ;; Process the org files to populate elfeed-feeds
+  (when (fboundp 'rmh-elfeed-org-process)
+    (rmh-elfeed-org-process rmh-elfeed-org-files rmh-elfeed-org-tree-id)))
 
 ;; Optional: Web browser for opening links
-(setq browse-url-browser-function 'browse-url-firefox)
+;; Detect the operating system and set the appropriate browser
+(cond
+ ((eq system-type 'darwin)  ; macOS
+  (setq browse-url-browser-function 'browse-url-default-macosx-browser))
+ ((eq system-type 'gnu/linux)  ; Linux
+  (setq browse-url-browser-function 'browse-url-firefox))
+ (t  ; Default fallback
+  (setq browse-url-browser-function 'browse-url-default-browser)))
 
 ;; Keybindings for elfeed
 (with-eval-after-load 'elfeed
@@ -77,39 +155,126 @@
   (define-key elfeed-search-mode-map (kbd "U") 'elfeed-update)
   (define-key elfeed-search-mode-map (kbd "f") 'elfeed-search-live-filter))
 
+;; Function to reload elfeed-org configuration
+(defun elfeed-org-reload ()
+  "Reload elfeed feeds from org files."
+  (interactive)
+  (when (featurep 'elfeed-org)
+    (setq elfeed-feeds nil)
+    (rmh-elfeed-org-process rmh-elfeed-org-files rmh-elfeed-org-tree-id)
+    (message "Elfeed feeds reloaded from org files. %d feeds loaded." (length elfeed-feeds))))
+
 ;; Update feeds every hour
 (run-at-time 0 (* 60 60) 'elfeed-update)
 
 ;; Sorting functions
 (defun elfeed-sort-by-date-ascending ()
-  "Sort elfeed entries by date ascending."
+  "Sort elfeed entries by date ascending (oldest first)."
   (interactive)
   (setq elfeed-sort-order 'ascending)
-  (elfeed-search-update :force))
+  (setf elfeed-search-sort-function nil)  ; nil means use default date sorting
+  (elfeed-search-update :force)
+  (message "Sorted by date: oldest first"))
 
 (defun elfeed-sort-by-date-descending ()
-  "Sort elfeed entries by date descending."
+  "Sort elfeed entries by date descending (newest first)."
   (interactive)
   (setq elfeed-sort-order 'descending)
-  (elfeed-search-update :force))
+  (setf elfeed-search-sort-function nil)  ; nil means use default date sorting
+  (elfeed-search-update :force)
+  (message "Sorted by date: newest first"))
 
 (defun elfeed-sort-by-title ()
-  "Sort elfeed entries by title."
+  "Sort elfeed entries alphabetically by title."
   (interactive)
   (setf elfeed-search-sort-function
         (lambda (a b)
-          (string< (elfeed-entry-title a)
-                   (elfeed-entry-title b))))
-  (elfeed-search-update :force))
+          (string< (downcase (elfeed-entry-title a))
+                   (downcase (elfeed-entry-title b)))))
+  (elfeed-search-update :force)
+  (message "Sorted alphabetically by title"))
+
+(defun elfeed-sort-by-title-reverse ()
+  "Sort elfeed entries reverse alphabetically by title."
+  (interactive)
+  (setf elfeed-search-sort-function
+        (lambda (a b)
+          (string> (downcase (elfeed-entry-title a))
+                   (downcase (elfeed-entry-title b)))))
+  (elfeed-search-update :force)
+  (message "Sorted reverse alphabetically by title"))
 
 (defun elfeed-sort-by-feed ()
-  "Sort elfeed entries by feed source."
+  "Sort elfeed entries by feed source name."
   (interactive)
   (setf elfeed-search-sort-function
         (lambda (a b)
-          (string< (elfeed-feed-title (elfeed-entry-feed a))
-                   (elfeed-feed-title (elfeed-entry-feed b)))))
-  (elfeed-search-update :force))
+          (let ((feed-a (elfeed-feed-title (elfeed-entry-feed a)))
+                (feed-b (elfeed-feed-title (elfeed-entry-feed b))))
+            (or (string< feed-a feed-b)
+                (and (string= feed-a feed-b)
+                     (> (elfeed-entry-date a) (elfeed-entry-date b)))))))
+  (elfeed-search-update :force)
+  (message "Sorted by feed source"))
+
+(defun elfeed-sort-by-tags ()
+  "Sort elfeed entries by their first tag alphabetically."
+  (interactive)
+  (setf elfeed-search-sort-function
+        (lambda (a b)
+          (let ((tags-a (mapcar #'symbol-name (elfeed-entry-tags a)))
+                (tags-b (mapcar #'symbol-name (elfeed-entry-tags b))))
+            (string< (or (car (sort tags-a #'string<)) "")
+                     (or (car (sort tags-b #'string<)) "")))))
+  (elfeed-search-update :force)
+  (message "Sorted by tags"))
+
+(defun elfeed-sort-by-author ()
+  "Sort elfeed entries by author (if available)."
+  (interactive)
+  (setf elfeed-search-sort-function
+        (lambda (a b)
+          (let ((author-a (or (elfeed-meta a :author) ""))
+                (author-b (or (elfeed-meta b :author) "")))
+            (string< author-a author-b))))
+  (elfeed-search-update :force)
+  (message "Sorted by author"))
+
+(defun elfeed-sort-by-unread-first ()
+  "Sort elfeed entries with unread entries first, then by date."
+  (interactive)
+  (setf elfeed-search-sort-function
+        (lambda (a b)
+          (let ((a-unread (member 'unread (elfeed-entry-tags a)))
+                (b-unread (member 'unread (elfeed-entry-tags b))))
+            (cond
+             ((and a-unread (not b-unread)) t)
+             ((and (not a-unread) b-unread) nil)
+             (t (> (elfeed-entry-date a) (elfeed-entry-date b)))))))
+  (elfeed-search-update :force)
+  (message "Sorted: unread first"))
+
+(defun elfeed-sort-by-starred-first ()
+  "Sort elfeed entries with starred entries first, then by date."
+  (interactive)
+  (setf elfeed-search-sort-function
+        (lambda (a b)
+          (let ((a-star (member 'star (elfeed-entry-tags a)))
+                (b-star (member 'star (elfeed-entry-tags b))))
+            (cond
+             ((and a-star (not b-star)) t)
+             ((and (not a-star) b-star) nil)
+             (t (> (elfeed-entry-date a) (elfeed-entry-date b)))))))
+  (elfeed-search-update :force)
+  (message "Sorted: starred first"))
+
+(defun elfeed-sort-reset ()
+  "Reset to default sorting (by date, newest first)."
+  (interactive)
+  (setq elfeed-sort-order 'descending)
+  (setf elfeed-search-sort-function nil)  ; nil means use default date sorting
+  (elfeed-search-update :force)
+  (message "Reset to default sorting (newest first)"))
 
 ;; Helper function to show only specific categories
 (defun elfeed-show-news ()
@@ -232,6 +397,69 @@
   (let ((filter (read-string "Enter filter: " elfeed-search-filter)))
     (elfeed-search-set-filter filter)))
 
+;; Help function to show available filters
+(defun elfeed-show-filter-help ()
+  "Show available filter and sorting keybindings."
+  (interactive)
+  (with-current-buffer (get-buffer-create "*Elfeed Help*")
+    (erase-buffer)
+    (insert "=== Elfeed Keybindings ===\n\n")
+    (insert "LOCATION FILTERS (l + key):\n")
+    (insert "  l m - Munich news\n")
+    (insert "  l b - Bavaria news\n")
+    (insert "  l g - Germany news\n")
+    (insert "  l e - Europe/EU news\n")
+    (insert "  l u - US news\n")
+    (insert "  l w - World news\n")
+    (insert "  l l - German language feeds\n")
+    (insert "  l a - All unread entries\n\n")
+    
+    (insert "CATEGORY FILTERS (C + key):\n")
+    (insert "  C n - News\n")
+    (insert "  C t - Technology\n")
+    (insert "  C s - Security\n")
+    (insert "  C p - Programming\n")
+    (insert "  C o - Open Source\n")
+    (insert "  C c - C++\n")
+    (insert "  C y - Python\n")
+    (insert "  C q - Qt\n")
+    (insert "  C * - Starred entries\n")
+    (insert "  C d - Today's entries\n")
+    (insert "  C a - All unread\n\n")
+    
+    (insert "ORDERING/SORTING (o + key):\n")
+    (insert "  o d - Date descending (newest first)\n")
+    (insert "  o D - Date ascending (oldest first)\n")
+    (insert "  o t - Title (A-Z)\n")
+    (insert "  o T - Title (Z-A)\n")
+    (insert "  o f - Feed source\n")
+    (insert "  o g - Tags/categories\n")
+    (insert "  o a - Author\n")
+    (insert "  o u - Unread first\n")
+    (insert "  o s - Starred first\n")
+    (insert "  o r - Reset to default\n\n")
+    
+    (insert "OTHER KEYS:\n")
+    (insert "  RET - Read entry\n")
+    (insert "  r   - Mark as read\n")
+    (insert "  u   - Mark as unread\n")
+    (insert "  m   - Toggle star\n")
+    (insert "  s   - Live filter\n")
+    (insert "  S   - Set filter\n")
+    (insert "  c   - Clear filter\n")
+    (insert "  g   - Refresh\n")
+    (insert "  G   - Fetch feeds\n")
+    (insert "  U   - Update feeds\n")
+    (insert "  b   - Browse URL\n")
+    (insert "  B   - Open in browser\n")
+    (insert "  E   - Open in EWW\n")
+    (insert "  q   - Quit\n")
+    (insert "  ?   - This help\n")
+    
+    (goto-char (point-min))
+    (special-mode)
+    (display-buffer (current-buffer))))
+
 ;; Article reading functions
 (defun elfeed-show-entry-in-eww ()
   "Open the current elfeed entry in eww browser."
@@ -351,11 +579,70 @@ If USE-GENERIC-P is non-nil, use eww-readable after loading."
     (when entry
       (browse-url (elfeed-entry-link entry)))))
 
+;; Create ordering/sorting keymap
+(defvar elfeed-ordering-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "d") 'elfeed-sort-by-date-descending)
+    (define-key map (kbd "D") 'elfeed-sort-by-date-ascending)
+    (define-key map (kbd "t") 'elfeed-sort-by-title)
+    (define-key map (kbd "T") 'elfeed-sort-by-title-reverse)
+    (define-key map (kbd "f") 'elfeed-sort-by-feed)
+    (define-key map (kbd "g") 'elfeed-sort-by-tags)
+    (define-key map (kbd "a") 'elfeed-sort-by-author)
+    (define-key map (kbd "u") 'elfeed-sort-by-unread-first)
+    (define-key map (kbd "s") 'elfeed-sort-by-starred-first)
+    (define-key map (kbd "r") 'elfeed-sort-reset)
+    map)
+  "Keymap for ordering/sorting entries in elfeed.")
+
+;; Create location filter keymap
+(defvar elfeed-location-filter-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "m") 'elfeed-show-munich)
+    (define-key map (kbd "b") 'elfeed-show-bavaria)
+    (define-key map (kbd "g") 'elfeed-show-germany)
+    (define-key map (kbd "e") 'elfeed-show-europe)
+    (define-key map (kbd "u") 'elfeed-show-us)
+    (define-key map (kbd "w") 'elfeed-show-world)
+    (define-key map (kbd "a") 'elfeed-show-all)
+    (define-key map (kbd "l") 'elfeed-show-german-language)
+    map)
+  "Keymap for location-based filters in elfeed.")
+
+;; Create category filter keymap
+(defvar elfeed-category-filter-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "n") 'elfeed-show-news)
+    (define-key map (kbd "t") 'elfeed-show-tech)
+    (define-key map (kbd "s") 'elfeed-show-security)
+    (define-key map (kbd "p") 'elfeed-show-programming)
+    (define-key map (kbd "o") 'elfeed-show-opensource)
+    (define-key map (kbd "c") 'elfeed-show-cpp)
+    (define-key map (kbd "y") 'elfeed-show-python)
+    (define-key map (kbd "q") 'elfeed-show-qt)
+    (define-key map (kbd "*") 'elfeed-show-starred)
+    (define-key map (kbd "a") 'elfeed-show-all)
+    (define-key map (kbd "d") 'elfeed-show-today)
+    map)
+  "Keymap for category-based filters in elfeed.")
+
 ;; Bind keys for article viewing
 (with-eval-after-load 'elfeed
   ;; In search mode
   (define-key elfeed-search-mode-map (kbd "E") 'elfeed-search-eww-open)
   (define-key elfeed-search-mode-map (kbd "B") 'elfeed-open-in-browser)
+  
+  ;; Bind location filters with 'l' prefix
+  (define-key elfeed-search-mode-map (kbd "l") elfeed-location-filter-map)
+  
+  ;; Bind category filters with 'c' prefix (note: 'c' currently clears filter, so using 'C')
+  (define-key elfeed-search-mode-map (kbd "C") elfeed-category-filter-map)
+  
+  ;; Bind ordering/sorting with 'o' prefix
+  (define-key elfeed-search-mode-map (kbd "o") elfeed-ordering-map)
+  
+  ;; Bind help function
+  (define-key elfeed-search-mode-map (kbd "?") 'elfeed-show-filter-help)
   
   ;; In show mode
   (define-key elfeed-show-mode-map (kbd "E") 'elfeed-show-eww-open)
@@ -363,11 +650,12 @@ If USE-GENERIC-P is non-nil, use eww-readable after loading."
   (define-key elfeed-show-mode-map (kbd "F") 'elfeed-show-toggle-full-article)
   (define-key elfeed-show-mode-map (kbd "B") 'elfeed-open-in-browser))
 
-;; Disable line numbers in elfeed buffers
+;; Disable line numbers in elfeed buffers and increase font size
 (add-hook 'elfeed-show-mode-hook 
           (lambda () 
             (display-line-numbers-mode -1)
-            (setq-local display-line-numbers nil)))
+            (setq-local display-line-numbers nil)
+            (text-scale-set 1)))  ; Increase font size by 1 step
             
 (add-hook 'elfeed-search-mode-hook 
           (lambda () 
