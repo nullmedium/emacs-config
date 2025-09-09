@@ -3,5 +3,13 @@
 
 EMACS_NO_DESKTOP=1 emacs -nw --eval "(progn
   (require 'elfeed nil t)
+  ;; Quit Emacs when q is pressed in elfeed
+  (add-hook 'elfeed-search-mode-hook
+            (lambda ()
+              ;; Override the quit behavior to exit Emacs
+              (local-set-key (kbd \"q\") 
+                             (lambda ()
+                               (interactive)
+                               (kill-emacs)))))
   (elfeed)
   (elfeed-update))"

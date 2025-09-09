@@ -3,4 +3,13 @@
 
 EMACS_NO_DESKTOP=1 emacs -nw --eval "(progn
   (when (fboundp 'portfolio-tracker)
+    ;; Quit Emacs when portfolio tracker buffer is killed
+    (add-hook 'tabulated-list-mode-hook
+              (lambda ()
+                (when (string-match-p \"\\*Portfolio Tracker\\*\" (buffer-name))
+                  (add-hook 'kill-buffer-hook
+                            (lambda ()
+                              (when (string-match-p \"\\*Portfolio Tracker\\*\" (buffer-name))
+                                (kill-emacs)))
+                            nil t))))
     (portfolio-tracker)))"

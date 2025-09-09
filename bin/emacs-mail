@@ -3,4 +3,12 @@
 
 EMACS_NO_DESKTOP=1 emacs -nw --eval "(progn
   (require 'mu4e nil t)
+  ;; Quit Emacs when mu4e main buffer is killed
+  (add-hook 'mu4e-main-mode-hook
+            (lambda ()
+              (add-hook 'kill-buffer-hook
+                        (lambda ()
+                          (when (eq major-mode 'mu4e-main-mode)
+                            (kill-emacs)))
+                        nil t)))
   (mu4e))"

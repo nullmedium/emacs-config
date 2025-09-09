@@ -6,15 +6,38 @@ if [ $# -eq 0 ]; then
     # No arguments, start with org-agenda
     EMACS_NO_DESKTOP=1 emacs -nw --eval "(progn
       (require 'org)
+      ;; Quit Emacs when org-agenda buffer is killed
+      (add-hook 'org-agenda-mode-hook
+                (lambda ()
+                  (add-hook 'kill-buffer-hook
+                            (lambda ()
+                              (when (eq major-mode 'org-agenda-mode)
+                                (kill-emacs)))
+                            nil t)))
       (org-agenda))"
 else
     # Open specified org file
     if [ -f "$1" ]; then
-        EMACS_NO_DESKTOP=1 emacs -nw "$1" --eval "(org-mode)"
+        EMACS_NO_DESKTOP=1 emacs -nw "$1" --eval "(progn
+          (org-mode)
+          ;; Quit Emacs when this org file buffer is killed
+          (add-hook 'kill-buffer-hook
+                    (lambda ()
+                      (when (and (eq major-mode 'org-mode)
+                                 (= (length (buffer-list)) 2))
+                        (kill-emacs)))
+                    nil t))"
     else
         # Create new org file
         EMACS_NO_DESKTOP=1 emacs -nw "$1" --eval "(progn
           (org-mode)
-          (insert \"#+TITLE: $(basename \"$1\" .org)\n#+DATE: $(date +%Y-%m-%d)\n\n\"))"
+          (insert \"#+TITLE: $(basename \"$1\" .org)\n#+DATE: $(date +%Y-%m-%d)\n\n\")
+          ;; Quit Emacs when this org file buffer is killed
+          (add-hook 'kill-buffer-hook
+                    (lambda ()
+                      (when (and (eq major-mode 'org-mode)
+                                 (= (length (buffer-list)) 2))
+                        (kill-emacs)))
+                    nil t))"
     fi
 fi

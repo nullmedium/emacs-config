@@ -11,6 +11,14 @@ if [ $# -eq 0 ]; then
         (package-refresh-contents)
         (package-install 'magit))
       (require 'magit)
+      ;; Quit Emacs when magit status buffer is killed
+      (add-hook 'magit-status-mode-hook
+                (lambda ()
+                  (add-hook 'kill-buffer-hook
+                            (lambda ()
+                              (when (eq major-mode 'magit-status-mode)
+                                (kill-emacs)))
+                            nil t)))
       (magit-status))"
 else
     # Use specified directory
@@ -25,5 +33,13 @@ else
         (package-refresh-contents)
         (package-install 'magit))
       (require 'magit)
+      ;; Quit Emacs when magit status buffer is killed
+      (add-hook 'magit-status-mode-hook
+                (lambda ()
+                  (add-hook 'kill-buffer-hook
+                            (lambda ()
+                              (when (eq major-mode 'magit-status-mode)
+                                (kill-emacs)))
+                            nil t)))
       (magit-status))"
 fi
