@@ -478,10 +478,11 @@
 
 (defun dev-mode-setup-keybindings ()
   "Set up development-specific keybindings."
-  (global-set-key (kbd "C-c t c") 'generate-cpp-tags)
-  (global-set-key (kbd "C-c t p") 'generate-python-tags)
-  (global-set-key (kbd "C-c t a") 'generate-all-tags)
-  (global-set-key (kbd "C-c q") 'quick-compile-and-run)
+  ;; Tag generation - use C-c C-t prefix to avoid conflict with CUA copy
+  (global-set-key (kbd "C-c C-t c") 'generate-cpp-tags)
+  (global-set-key (kbd "C-c C-t p") 'generate-python-tags)
+  (global-set-key (kbd "C-c C-t a") 'generate-all-tags)
+  (global-set-key (kbd "C-c C-q") 'quick-compile-and-run)
   (global-set-key (kbd "M-.") 'xref-find-definitions)
   (global-set-key (kbd "M-,") 'xref-pop-marker-stack)
   (global-set-key (kbd "C-M-.") 'xref-find-references)
@@ -502,19 +503,25 @@
   (interactive)
   (with-output-to-temp-buffer "*Development Mode Help*"
     (princ "=== Development Mode Key Bindings ===\n\n")
+    (princ "EDITING (CUA MODE):\n")
+    (princ "  C-c        : Copy\n")
+    (princ "  C-v        : Paste\n")
+    (princ "  C-x        : Cut\n")
+    (princ "  C-z        : Undo\n")
+    (princ "  C-<return> : Rectangle selection\n\n")
     (princ "LSP COMMANDS:\n")
     (princ "  C-c l      : LSP prefix for all LSP commands\n")
     (princ "  M-.        : Go to definition\n")
     (princ "  M-,        : Return from definition\n")
     (princ "  C-M-.      : Find references\n\n")
     (princ "TAGS & NAVIGATION:\n")
-    (princ "  C-c t c    : Generate C++ TAGS file\n")
-    (princ "  C-c t p    : Generate Python TAGS file\n")
-    (princ "  C-c t a    : Generate TAGS for all files\n\n")
+    (princ "  C-c C-t c  : Generate C++ TAGS file\n")
+    (princ "  C-c C-t p  : Generate Python TAGS file\n")
+    (princ "  C-c C-t a  : Generate TAGS for all files\n\n")
     (princ "COMPILATION & EXECUTION:\n")
     (princ "  C-c c      : Compile current file\n")
     (princ "  C-c r      : Run (GDB for C++, Python REPL for Python)\n")
-    (princ "  C-c q      : Quick compile and run\n")
+    (princ "  C-c C-q    : Quick compile and run\n")
     (princ "  C-c C-c    : Recompile (C++) or Send buffer to Python\n\n")
     (princ "PROJECT MANAGEMENT:\n")
     (princ "  C-c p      : Projectile commands prefix\n\n")
@@ -574,8 +581,11 @@
     (add-to-list 'auto-mode-alist '("\\.qml\\'" . qml-mode))
     ;; Set up help command
     (global-set-key (kbd "C-c h") 'show-dev-mode-help)
+    ;; Stop elfeed auto-updates to prevent UI lag
+    (when (fboundp 'elfeed-stop-auto-updates)
+      (elfeed-stop-auto-updates))
     (setq dev-mode-enabled t)
-    (message "Development mode enabled! Press C-c h for help. QML files will use qml-mode.")))
+    (message "Development mode enabled! Press C-c h for help. QML files will use qml-mode. Elfeed auto-updates disabled.")))
 
 ;;;###autoload
 (defun disable-dev-mode ()
@@ -590,9 +600,12 @@
     (yas-global-mode -1)
     (projectile-mode -1)
     (global-hl-todo-mode -1)
+    ;; Re-enable elfeed auto-updates
+    (when (fboundp 'elfeed-start-auto-updates)
+      (elfeed-start-auto-updates))
     ;; Note: Some modes might require restarting Emacs to fully disable
     (setq dev-mode-enabled nil)
-    (message "Development mode disabled. Some features may require restarting Emacs to fully disable.")))
+    (message "Development mode disabled. Elfeed auto-updates re-enabled. Some features may require restarting Emacs to fully disable.")))
 
 ;;;###autoload
 (defun dev-mode-status ()

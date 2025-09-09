@@ -13,6 +13,8 @@
   (setq shr-max-image-proportion 0.7) ; Limit image size
   (setq shr-width nil)                ; Use full window width
   (setq shr-bullet "• ")              ; Nice bullet character
+  (setq shr-inhibit-images nil)       ; Enable image display
+  (setq shr-blocked-images nil)       ; Don't block any images
   
   ;; Increase indentation for better structure
   (setq shr-indentation 2)

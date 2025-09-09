@@ -23,6 +23,7 @@
 (require 'init-editor)    ; Basic editor enhancements
 (require 'init-project)   ; Project management with projectile
 (require 'init-vcs)       ; Version control (diff-hl)
+(require 'init-magit)     ; Magit git interface
 (require 'init-search)    ; Search tools
 (require 'init-dired)     ; Dired configuration
 (require 'init-treemacs)  ; Treemacs file browser
@@ -39,7 +40,7 @@
 ;;; Load optional configurations
 
 ;; Development configuration - Modern version with Eglot
-(let ((dev-config-modern (expand-file-name "emacs-dev-config-modern.el" user-emacs-directory)))
+(let ((dev-config-modern (expand-file-name "lisp/emacs-dev-config-modern.el" user-emacs-directory)))
   (when (file-exists-p dev-config-modern)
     (load-file dev-config-modern)
     (add-hook 'emacs-startup-hook
@@ -49,24 +50,24 @@
                                   (message "Modern development mode available. Use M-x enable-dev-mode-modern to activate.")))))))
 
 ;; Legacy development configuration (lsp-mode) - kept for compatibility
-(let ((dev-config (expand-file-name "emacs-dev-config.el" user-emacs-directory)))
+(let ((dev-config (expand-file-name "lisp/emacs-dev-config.el" user-emacs-directory)))
   (when (file-exists-p dev-config)
     (load-file dev-config)))
 
 ;; SHR Configuration (for HTML rendering in mu4e, elfeed, eww)
-(let ((shr-config (expand-file-name "shr-config.el" user-emacs-directory)))
+(let ((shr-config (expand-file-name "lisp/shr-config.el" user-emacs-directory)))
   (when (file-exists-p shr-config)
     (load-file shr-config)
     (message "SHR configuration loaded.")))
 
 ;; RSS Reader Configuration (Elfeed)
-(let ((elfeed-config (expand-file-name "elfeed-config.el" user-emacs-directory)))
+(let ((elfeed-config (expand-file-name "lisp/elfeed-config.el" user-emacs-directory)))
   (when (file-exists-p elfeed-config)
     (load-file elfeed-config)
     (message "Elfeed RSS reader configuration loaded.")))
 
 ;; Email Configuration (mu4e)
-(let ((mu4e-config (expand-file-name "mu4e-config.el" user-emacs-directory)))
+(let ((mu4e-config (expand-file-name "lisp/mu4e-config.el" user-emacs-directory)))
   (when (file-exists-p mu4e-config)
     (condition-case err
         (progn
@@ -76,20 +77,20 @@
        (message "mu4e configuration available but mu4e not installed. Install mu4e package to enable email.")))))
 
 ;; Beancount Configuration
-(let ((beancount-config (expand-file-name "beancount-config.el" user-emacs-directory)))
+(let ((beancount-config (expand-file-name "lisp/beancount-config.el" user-emacs-directory)))
   (when (file-exists-p beancount-config)
     (load-file beancount-config)
     (message "Beancount portfolio tracking configuration loaded.")))
 
 ;; Portfolio Tracker Configuration
 (with-eval-after-load 'tabulated-list
-  (let ((portfolio-tracker (expand-file-name "portfolio-tracker-v2.el" user-emacs-directory)))
+  (let ((portfolio-tracker (expand-file-name "lisp/portfolio-tracker-v2.el" user-emacs-directory)))
     (when (file-exists-p portfolio-tracker)
       (load-file portfolio-tracker)
       (message "Portfolio tracker with live prices loaded."))))
 
 ;; Keybinding fixes for special modes
-(let ((keybinding-fix (expand-file-name "keybinding-fix.el" user-emacs-directory)))
+(let ((keybinding-fix (expand-file-name "lisp/keybinding-fix.el" user-emacs-directory)))
   (when (file-exists-p keybinding-fix)
     (load-file keybinding-fix)
     ;; Automatically apply fixes for special modes

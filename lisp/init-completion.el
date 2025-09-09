@@ -167,6 +167,38 @@
   (corfu-on-exact-match nil)     ;; Configure handling of exact matches
   (corfu-scroll-margin 5)        ;; Use scroll margin
 
+  :config
+  ;; Fix font issues with Corfu child frames
+  (defun corfu--fix-child-frame-font (frame)
+    "Ensure child frames don't inherit problematic font specs."
+    frame)
+  
+  ;; Override the frame parameters to avoid font issues
+  (setq corfu--frame-parameters
+        '((no-accept-focus . t)
+          (no-focus-on-map . t)
+          (min-width . t)
+          (min-height . t)
+          (border-width . 0)
+          (outer-border-width . 0)
+          (internal-border-width . 1)
+          (child-frame-border-width . 1)
+          (left-fringe . 7)
+          (right-fringe . 7)
+          (vertical-scroll-bars)
+          (horizontal-scroll-bars)
+          (menu-bar-lines . 0)
+          (tool-bar-lines . 0)
+          (tab-bar-lines . 0)
+          (tab-bar-lines-keep-state . t)
+          (no-other-frame . t)
+          (unsplittable . t)
+          (undecorated . t)
+          (cursor-type)
+          (no-special-glyphs . t)
+          (desktop-dont-save . t)
+          (inhibit-double-buffering . t)))
+  
   :init
   (global-corfu-mode))
 
@@ -194,7 +226,10 @@
   (let ((root (or (projectile-project-root) default-directory)))
     (consult-ripgrep root)))
 
+;; Quick access to ripgrep - C-c r for backward compatibility
 (global-set-key (kbd "C-c r") 'consult-ripgrep-project-root)
+;; Additional quick binding for project search
+(global-set-key (kbd "C-c /") 'consult-ripgrep-project-root)
 
 ;;; Make completion work nicely with Projectile
 (with-eval-after-load 'projectile

@@ -51,8 +51,14 @@
                     (lambda ()
                       (message "Feed update complete!"))))
   
+  ;; Store timer references so we can cancel them
+  (defvar elfeed-update-timer-30min nil
+    "Timer for 30-minute elfeed updates.")
+  
   ;; Auto-update feeds every 30 minutes in the background
-  (run-with-timer 0 (* 30 60) #'elfeed-update-async)
+  ;; Delayed start to avoid impacting startup performance
+  (setq elfeed-update-timer-30min
+        (run-with-timer (* 5 60) (* 30 60) #'elfeed-update-async))
   
   ;; Custom function for fuzzy relative timestamps
   (defun my-elfeed-search-format-date (date)
@@ -191,8 +197,35 @@
     (rmh-elfeed-org-process rmh-elfeed-org-files rmh-elfeed-org-tree-id)
     (message "Elfeed feeds reloaded from org files. %d feeds loaded." (length elfeed-feeds))))
 
+;; Store timer reference for hourly updates
+(defvar elfeed-update-timer-hourly nil
+  "Timer for hourly elfeed updates.")
+
 ;; Update feeds every hour
-(run-at-time 0 (* 60 60) 'elfeed-update)
+(setq elfeed-update-timer-hourly
+      (run-at-time 0 (* 60 60) 'elfeed-update))
+
+;; Functions to control auto-updates
+(defun elfeed-stop-auto-updates ()
+  "Stop all automatic elfeed feed updates."
+  (interactive)
+  (when (timerp elfeed-update-timer-30min)
+    (cancel-timer elfeed-update-timer-30min)
+    (setq elfeed-update-timer-30min nil))
+  (when (timerp elfeed-update-timer-hourly)
+    (cancel-timer elfeed-update-timer-hourly)
+    (setq elfeed-update-timer-hourly nil))
+  (message "Elfeed auto-updates stopped."))
+
+(defun elfeed-start-auto-updates ()
+  "Start automatic elfeed feed updates."
+  (interactive)
+  (elfeed-stop-auto-updates) ; Stop any existing timers first
+  (setq elfeed-update-timer-30min
+        (run-with-timer (* 5 60) (* 30 60) #'elfeed-update-async))
+  (setq elfeed-update-timer-hourly
+        (run-at-time 0 (* 60 60) 'elfeed-update))
+  (message "Elfeed auto-updates started."))
 
 ;; Sorting functions
 (defun elfeed-sort-by-date-ascending ()
@@ -606,6 +639,22 @@ If USE-GENERIC-P is non-nil, use eww-readable after loading."
     (when entry
       (browse-url (elfeed-entry-link entry)))))
 
+(defun elfeed-show-open-image-at-point ()
+  "Open image at point in external viewer (useful in terminal mode)."
+  (interactive)
+  (let ((url (or (get-text-property (point) 'image-url)
+                 (get-text-property (point) 'shr-url)
+                 (thing-at-point 'url))))
+    (if url
+        (progn
+          (if (display-graphic-p)
+              ;; In GUI mode, try to display inline
+              (browse-url url)
+            ;; In terminal mode, open with external viewer
+            (start-process "image-viewer" nil "xdg-open" url))
+          (message "Opening image: %s" url))
+      (message "No image found at point"))))
+
 ;; Create ordering/sorting keymap
 (defvar elfeed-ordering-map
   (let ((map (make-sparse-keymap)))
@@ -675,14 +724,23 @@ If USE-GENERIC-P is non-nil, use eww-readable after loading."
   (define-key elfeed-show-mode-map (kbd "E") 'elfeed-show-eww-open)
   (define-key elfeed-show-mode-map (kbd "R") 'elfeed-show-readable)
   (define-key elfeed-show-mode-map (kbd "F") 'elfeed-show-toggle-full-article)
-  (define-key elfeed-show-mode-map (kbd "B") 'elfeed-open-in-browser))
+  (define-key elfeed-show-mode-map (kbd "B") 'elfeed-open-in-browser)
+  (define-key elfeed-show-mode-map (kbd "I") 'elfeed-show-open-image-at-point))
 
 ;; Disable line numbers in elfeed buffers and increase font size
 (add-hook 'elfeed-show-mode-hook 
           (lambda () 
             (display-line-numbers-mode -1)
             (setq-local display-line-numbers nil)
-            (text-scale-set 1)))  ; Increase font size by 1 step
+            (text-scale-set 1)  ; Increase font size by 1 step
+            ;; Handle images based on display type
+            (if (display-graphic-p)
+                ;; GUI mode - show images inline
+                (progn
+                  (setq-local shr-inhibit-images nil)
+                  (setq-local shr-blocked-images nil))
+              ;; Terminal mode - show placeholders
+              (setq-local shr-inhibit-images t))))
             
 (add-hook 'elfeed-search-mode-hook 
           (lambda () 

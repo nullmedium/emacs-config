@@ -180,9 +180,9 @@
   (global-set-key (kbd "<f5>") 'compile)
   (global-set-key (kbd "<f6>") 'recompile)
   
-  ;; Testing
-  (global-set-key (kbd "C-c t p") 'projectile-test-project)
-  (global-set-key (kbd "C-c t f") 'projectile-test-file)
+  ;; Testing - use C-c C-t prefix to avoid conflict with CUA copy
+  (global-set-key (kbd "C-c C-t p") 'projectile-test-project)
+  (global-set-key (kbd "C-c C-t f") 'projectile-test-file)
   
   ;; Navigation
   (global-set-key (kbd "M-.") 'xref-find-definitions)
@@ -212,8 +212,11 @@
     ;; Load tree-sitter if available
     (when (file-exists-p (expand-file-name "lisp/init-treesitter.el" user-emacs-directory))
       (require 'init-treesitter))
+    ;; Stop elfeed auto-updates to prevent UI lag
+    (when (fboundp 'elfeed-stop-auto-updates)
+      (elfeed-stop-auto-updates))
     (setq dev-mode-modern-enabled t)
-    (message "Modern development mode enabled! Eglot will auto-start for supported files.")))
+    (message "Modern development mode enabled! Eglot will auto-start for supported files. Elfeed auto-updates disabled.")))
 
 ;;;###autoload
 (defun disable-dev-mode-modern ()
@@ -228,8 +231,11 @@
     ;; Disable some modes
     (yas-global-mode -1)
     (global-flycheck-mode -1)
+    ;; Re-enable elfeed auto-updates
+    (when (fboundp 'elfeed-start-auto-updates)
+      (elfeed-start-auto-updates))
     (setq dev-mode-modern-enabled nil)
-    (message "Modern development mode disabled.")))
+    (message "Modern development mode disabled. Elfeed auto-updates re-enabled.")))
 
 (provide 'emacs-dev-config-modern)
 ;;; emacs-dev-config-modern.el ends here

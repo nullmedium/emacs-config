@@ -15,10 +15,135 @@
 (show-paren-mode 1)
 (setq show-paren-delay 0)
 
-;; CUA mode for rectangles - use selection mode only to avoid conflicts
-(cua-selection-mode t)  ; Only rectangle selection, not full CUA bindings
+;; Enable syntax highlighting globally
+(global-font-lock-mode t)
+(setq font-lock-maximum-decoration t)
+(setq font-lock-support-mode 'jit-lock-mode)
+(setq jit-lock-contextually t)
+(setq jit-lock-stealth-time 5)
+
+;; Enable full CUA mode for standard copy/paste/cut
+;; This provides C-c (copy), C-v (paste), C-x (cut), C-z (undo)
+(setq cua-enable-cua-keys t)
 (setq cua-auto-tabify-rectangles nil)
 (setq cua-keep-region-after-copy t)
+;; Make CUA mode work properly with other keybindings
+(setq cua-prefix-override-inhibit-delay 0.001)
+(cua-mode t)
+
+;; Function to ensure CUA bindings work properly
+(defun ensure-cua-bindings ()
+  "Ensure CUA mode bindings are properly set."
+  (interactive)
+  ;; Force CUA mode to be on
+  (cua-mode 1)
+  ;; Ensure the keybindings are active
+  (setq cua-enable-cua-keys t)
+  (message "CUA bindings reinforced: C-c (copy), C-v (paste), C-x (cut), C-z (undo)"))
+
+;; Run this after all init files are loaded
+(add-hook 'after-init-hook 'ensure-cua-bindings)
+
+;; Ensure CUA works in programming modes
+(add-hook 'prog-mode-hook 
+          (lambda ()
+            (when (not cua-mode)
+              (cua-mode 1))
+            (local-set-key (kbd "C-c") nil)  ; Clear any local C-c binding
+            (local-set-key (kbd "C-v") nil)  ; Clear any local C-v binding
+            ))
+
+;; Function to fix syntax highlighting in current buffer
+(defun fix-syntax-highlighting ()
+  "Fix syntax highlighting in the current buffer."
+  (interactive)
+  (font-lock-mode -1)
+  (font-lock-mode 1)
+  (font-lock-fontify-buffer)
+  (message "Syntax highlighting refreshed"))
+
+;; Function to switch between tree-sitter and regular modes
+(defun toggle-tree-sitter-mode ()
+  "Toggle between tree-sitter and regular mode for current buffer."
+  (interactive)
+  (cond
+   ((eq major-mode 'c-ts-mode)
+    (c-mode)
+    (message "Switched to regular c-mode"))
+   ((eq major-mode 'c++-ts-mode)
+    (c++-mode)
+    (message "Switched to regular c++-mode"))
+   ((eq major-mode 'c-mode)
+    (if (fboundp 'c-ts-mode)
+        (progn (c-ts-mode)
+               (message "Switched to c-ts-mode"))
+      (message "Tree-sitter mode not available")))
+   ((eq major-mode 'c++-mode)
+    (if (fboundp 'c++-ts-mode)
+        (progn (c++-ts-mode)
+               (message "Switched to c++-ts-mode"))
+      (message "Tree-sitter mode not available")))
+   (t (message "Not in a C/C++ buffer"))))
+
+;; Function to diagnose syntax highlighting issues
+(defun diagnose-syntax-highlighting ()
+  "Diagnose syntax highlighting issues in current buffer."
+  (interactive)
+  (with-output-to-temp-buffer "*Syntax Highlighting Diagnostics*"
+    (princ "=== SYNTAX HIGHLIGHTING DIAGNOSTICS ===\n\n")
+    (princ (format "Buffer: %s\n" (buffer-name)))
+    (princ (format "Major mode: %s\n" major-mode))
+    (princ (format "Font-lock mode: %s\n" (if font-lock-mode "ENABLED" "DISABLED")))
+    (princ (format "Global font-lock mode: %s\n" (if global-font-lock-mode "ENABLED" "DISABLED")))
+    (princ (format "Font-lock keywords defined: %s\n" 
+                   (if font-lock-keywords "YES" "NO")))
+    (princ (format "Buffer size: %d bytes\n" (buffer-size)))
+    (princ (format "File size threshold check: %s\n"
+                   (if (> (buffer-size) (* 1024 1024)) 
+                       "LARGE FILE (>1MB) - highlighting may be disabled"
+                       "Normal size")))
+    (princ "\nTo fix issues, try:\n")
+    (princ "  M-x fix-syntax-highlighting\n")
+    (princ "  M-x font-lock-mode (toggle off and on)\n")
+    (princ "  M-x font-lock-fontify-buffer\n")))
+
+;; Ensure font-lock works in C/C++ modes (both regular and tree-sitter)
+(defun ensure-c-syntax-highlighting ()
+  "Ensure syntax highlighting works in C/C++ modes."
+  (font-lock-mode 1)
+  (setq font-lock-keywords-case-fold-search nil)
+  ;; Force fontification if needed
+  (when (and (boundp 'font-lock-mode) (not font-lock-mode))
+    (font-lock-mode 1))
+  ;; For tree-sitter modes, ensure proper setup
+  (when (or (eq major-mode 'c-ts-mode) 
+            (eq major-mode 'c++-ts-mode))
+    (when (fboundp 'treesit-font-lock-recompute-features)
+      (treesit-font-lock-recompute-features))))
+
+;; Apply to all C/C++ mode variants
+(add-hook 'c-mode-hook 'ensure-c-syntax-highlighting)
+(add-hook 'c++-mode-hook 'ensure-c-syntax-highlighting)
+(add-hook 'c-ts-mode-hook 'ensure-c-syntax-highlighting)
+(add-hook 'c++-ts-mode-hook 'ensure-c-syntax-highlighting)
+
+;; Diagnostic function for CUA mode
+(defun diagnose-cua-mode ()
+  "Diagnose CUA mode settings and keybindings."
+  (interactive)
+  (with-output-to-temp-buffer "*CUA Mode Diagnostics*"
+    (princ "=== CUA MODE DIAGNOSTICS ===\n\n")
+    (princ (format "CUA mode enabled: %s\n" (if cua-mode "YES" "NO")))
+    (princ (format "CUA keys enabled: %s\n" (if cua-enable-cua-keys "YES" "NO")))
+    (princ (format "CUA prefix override delay: %s\n" cua-prefix-override-inhibit-delay))
+    (princ "\nKey bindings:\n")
+    (princ (format "C-c binding: %s\n" (key-binding (kbd "C-c"))))
+    (princ (format "C-v binding: %s\n" (key-binding (kbd "C-v"))))
+    (princ (format "C-x binding: %s\n" (key-binding (kbd "C-x"))))
+    (princ (format "C-z binding: %s\n" (key-binding (kbd "C-z"))))
+    (princ "\nTo fix issues, try:\n")
+    (princ "  M-x ensure-cua-bindings\n")
+    (princ "  M-x cua-mode (toggle off and on)\n")))
 
 ;; Trailing whitespace
 (setq show-trailing-whitespace t)
@@ -56,11 +181,13 @@
                     :foundry "nil"
                     :slant 'normal
                     :weight 'regular
-                    :height 140
+                    :height 180
                     :width 'normal)
 
 ;; Ensure font settings apply to new frames
-(add-to-list 'default-frame-alist '(font . "0xProto Nerd Font Mono-14"))
+;; Use the proper font spec format
+(add-to-list 'default-frame-alist 
+             (cons 'font (font-spec :family "0xProto Nerd Font Mono" :size 18)))
 
 ;;; Diff-hl face customizations
 (with-eval-after-load 'diff-hl
@@ -69,6 +196,10 @@
   (set-face-attribute 'diff-hl-insert nil :background "green3" :foreground "green3"))
 
 ;;; Theme Management
+;; Add lisp directory to theme load path
+(add-to-list 'custom-theme-load-path
+             (expand-file-name "lisp" user-emacs-directory))
+
 (defvar jens-themes
   '(developer-dark
     modus-vivendi
