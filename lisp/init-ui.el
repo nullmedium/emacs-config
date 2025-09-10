@@ -22,36 +22,47 @@
 (setq jit-lock-contextually t)
 (setq jit-lock-stealth-time 5)
 
+;;; CUA Mode Configuration
 ;; Enable full CUA mode for standard copy/paste/cut
 ;; This provides C-c (copy), C-v (paste), C-x (cut), C-z (undo)
 (setq cua-enable-cua-keys t)
 (setq cua-auto-tabify-rectangles nil)
 (setq cua-keep-region-after-copy t)
-;; Make CUA mode work properly with other keybindings
+
+;; CRITICAL: Set a very short delay to allow C-c to work as prefix when needed
+;; This allows C-c C-something to work while C-c alone copies
 (setq cua-prefix-override-inhibit-delay 0.001)
-(cua-mode t)
 
-;; Function to ensure CUA bindings work properly
-(defun ensure-cua-bindings ()
-  "Ensure CUA mode bindings are properly set."
-  (interactive)
-  ;; Force CUA mode to be on
-  (cua-mode 1)
+;; Enable CUA mode
+(cua-mode 1)
+
+;; Function to disable CUA in modes where it conflicts
+(defun disable-cua-in-conflicting-modes ()
+  "Disable CUA mode in modes where it causes conflicts."
+  (dolist (hook '(elfeed-search-mode-hook
+                  elfeed-show-mode-hook
+                  magit-mode-hook
+                  dired-mode-hook
+                  help-mode-hook
+                  compilation-mode-hook
+                  special-mode-hook))
+    (add-hook hook
+              (lambda ()
+                (setq-local cua-mode nil)
+                (setq-local cua-enable-cua-keys nil)))))
+
+;; Apply mode-specific fixes
+(disable-cua-in-conflicting-modes)
+
+;; Ensure CUA works properly after init
+(defun ensure-cua-after-init ()
+  "Ensure CUA mode is properly configured after initialization."
+  (when (not cua-mode)
+    (cua-mode 1))
   ;; Ensure the keybindings are active
-  (setq cua-enable-cua-keys t)
-  (message "CUA bindings reinforced: C-c (copy), C-v (paste), C-x (cut), C-z (undo)"))
+  (setq cua-enable-cua-keys t))
 
-;; Run this after all init files are loaded
-(add-hook 'after-init-hook 'ensure-cua-bindings)
-
-;; Ensure CUA works in programming modes
-(add-hook 'prog-mode-hook 
-          (lambda ()
-            (when (not cua-mode)
-              (cua-mode 1))
-            (local-set-key (kbd "C-c") nil)  ; Clear any local C-c binding
-            (local-set-key (kbd "C-v") nil)  ; Clear any local C-v binding
-            ))
+(add-hook 'after-init-hook 'ensure-cua-after-init)
 
 ;; Function to fix syntax highlighting in current buffer
 (defun fix-syntax-highlighting ()

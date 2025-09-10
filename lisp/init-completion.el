@@ -151,73 +151,62 @@
   :hook
   (embark-collect-mode . consult-preview-at-point-mode))
 
-;;; Corfu - In-buffer completion popup
-(use-package corfu
+;;; Company - In-buffer completion framework
+(use-package company
   :ensure t
+  :diminish company-mode
+  :hook (after-init . global-company-mode)
   :custom
-  (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
-  (corfu-auto t)                 ;; Enable auto completion
-  (corfu-auto-delay 0.2)
-  (corfu-auto-prefix 2)
-  (corfu-separator ?\s)          ;; Orderless field separator
-  (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
-  (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
-  (corfu-preview-current nil)    ;; Disable current candidate preview
-  (corfu-preselect 'prompt)      ;; Preselect the prompt
-  (corfu-on-exact-match nil)     ;; Configure handling of exact matches
-  (corfu-scroll-margin 5)        ;; Use scroll margin
-
+  (company-idle-delay 0.2)
+  (company-minimum-prefix-length 2)
+  (company-show-numbers t)
+  (company-tooltip-align-annotations t)
+  (company-tooltip-flip-when-above t)
+  (company-require-match nil)
+  (company-dabbrev-downcase nil)
+  (company-dabbrev-ignore-case nil)
+  (company-selection-wrap-around t)
+  (company-transformers '(company-sort-by-occurrence))
+  
   :config
-  ;; Fix font issues with Corfu child frames
-  (defun corfu--fix-child-frame-font (frame)
-    "Ensure child frames don't inherit problematic font specs."
-    frame)
+  ;; Use Tab and Shift-Tab to navigate completions
+  (define-key company-active-map (kbd "TAB") 'company-complete-selection)
+  (define-key company-active-map (kbd "<tab>") 'company-complete-selection)
+  (define-key company-active-map (kbd "S-TAB") 'company-select-previous)
+  (define-key company-active-map (kbd "<backtab>") 'company-select-previous)
   
-  ;; Override the frame parameters to avoid font issues
-  (setq corfu--frame-parameters
-        '((no-accept-focus . t)
-          (no-focus-on-map . t)
-          (min-width . t)
-          (min-height . t)
-          (border-width . 0)
-          (outer-border-width . 0)
-          (internal-border-width . 1)
-          (child-frame-border-width . 1)
-          (left-fringe . 7)
-          (right-fringe . 7)
-          (vertical-scroll-bars)
-          (horizontal-scroll-bars)
-          (menu-bar-lines . 0)
-          (tool-bar-lines . 0)
-          (tab-bar-lines . 0)
-          (tab-bar-lines-keep-state . t)
-          (no-other-frame . t)
-          (unsplittable . t)
-          (undecorated . t)
-          (cursor-type)
-          (no-special-glyphs . t)
-          (desktop-dont-save . t)
-          (inhibit-double-buffering . t)))
+  ;; Use C-n and C-p for navigation as well
+  (define-key company-active-map (kbd "C-n") 'company-select-next)
+  (define-key company-active-map (kbd "C-p") 'company-select-previous)
   
-  :init
-  (global-corfu-mode))
+  ;; Disable conflicting bindings
+  (define-key company-active-map (kbd "RET") nil)
+  (define-key company-active-map (kbd "<return>") nil)
+  
+  ;; Complete with Enter
+  (define-key company-active-map (kbd "RET") 'company-complete-selection)
+  (define-key company-active-map (kbd "<return>") 'company-complete-selection)
+  
+  ;; Configure backends
+  (setq company-backends
+        '((company-capf company-files)
+          (company-dabbrev-code company-keywords)
+          company-dabbrev)))
 
-;;; Cape - Completion extensions for Corfu
-(use-package cape
-  :ensure t
-  :init
-  ;; Add `completion-at-point-functions', used by `completion-at-point'.
-  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
-  (add-to-list 'completion-at-point-functions #'cape-file)
-  (add-to-list 'completion-at-point-functions #'cape-keyword)
-  ;;(add-to-list 'completion-at-point-functions #'cape-tex)
-  ;;(add-to-list 'completion-at-point-functions #'cape-sgml)
-  ;;(add-to-list 'completion-at-point-functions #'cape-rfc1345)
-  ;;(add-to-list 'completion-at-point-functions #'cape-abbrev)
-  ;;(add-to-list 'completion-at-point-functions #'cape-dict)
-  ;;(add-to-list 'completion-at-point-functions #'cape-symbol)
-  ;;(add-to-list 'completion-at-point-functions #'cape-line)
-  )
+;;; Company-box - Better UI for Company (optional, may not be available)
+;; Commented out as company-box is not always available in package repos
+;; Uncomment if you want to try installing it manually
+;; (use-package company-box
+;;   :ensure t
+;;   :hook (company-mode . company-box-mode)
+;;   :custom
+;;   (company-box-show-single-candidate t)
+;;   (company-box-backends-colors nil)
+;;   (company-box-max-candidates 50)
+;;   (company-box-icons-alist 'company-box-icons-all-the-icons)
+;;   :config
+;;   ;; Workaround for font/display issues
+;;   (setq company-box-doc-enable nil)) ;; Disable doc popup to avoid display issues
 
 ;;; Additional Consult commands for enhanced functionality
 (defun consult-ripgrep-project-root ()

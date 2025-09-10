@@ -89,15 +89,11 @@
       (load-file portfolio-tracker)
       (message "Portfolio tracker with live prices loaded."))))
 
-;; Keybinding fixes for special modes
-(let ((keybinding-fix (expand-file-name "lisp/keybinding-fix.el" user-emacs-directory)))
-  (when (file-exists-p keybinding-fix)
-    (load-file keybinding-fix)
-    ;; Automatically apply fixes for special modes
-    (fix-elfeed-keybindings)
-    (fix-portfolio-tracker-keybindings)
-    (disable-cua-in-special-modes)
-    (message "Keybinding fixes loaded and applied.")))
+;; Keybinding fixes are now integrated into the respective configuration files:
+;; - Elfeed fixes in lisp/elfeed-config.el
+;; - Portfolio tracker fixes in portfolio-tracker-v2.el
+;; - CUA mode handling in lisp/init-ui.el
+;; - Diagnostic functions in lisp/init-editor.el
 
 ;;; Custom Settings (preserved from original)
 ;;; These are managed by Emacs Custom system - do not edit manually

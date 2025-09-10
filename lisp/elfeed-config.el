@@ -181,12 +181,28 @@
 
 ;; Keybindings for elfeed
 (with-eval-after-load 'elfeed
+  ;; Disable CUA mode in elfeed buffers to allow single-key commands
+  (add-hook 'elfeed-search-mode-hook
+            (lambda ()
+              (setq-local cua-mode nil)
+              (setq-local cua-enable-cua-keys nil)))
+  
+  (add-hook 'elfeed-show-mode-hook
+            (lambda ()
+              (setq-local cua-mode nil)
+              (setq-local cua-enable-cua-keys nil)))
+  
+  ;; Define keybindings
   (define-key elfeed-search-mode-map (kbd "j") 'next-line)
   (define-key elfeed-search-mode-map (kbd "k") 'previous-line)
   (define-key elfeed-search-mode-map (kbd "m") 'elfeed-search-toggle-all-star)
   (define-key elfeed-search-mode-map (kbd "u") 'elfeed-search-toggle-all-unread)
   (define-key elfeed-search-mode-map (kbd "U") 'elfeed-update-async)
-  (define-key elfeed-search-mode-map (kbd "f") 'elfeed-search-live-filter))
+  (define-key elfeed-search-mode-map (kbd "f") 'elfeed-search-live-filter)
+  (define-key elfeed-search-mode-map (kbd "g") 'elfeed-search-update--force)
+  (define-key elfeed-search-mode-map (kbd "G") 'elfeed-search-fetch)
+  (define-key elfeed-search-mode-map (kbd "r") 'elfeed-search-untag-all-unread)
+  (define-key elfeed-search-mode-map (kbd "s") 'elfeed-search-live-filter))
 
 ;; Function to reload elfeed-org configuration
 (defun elfeed-org-reload ()
