@@ -21,22 +21,93 @@
 (defun backward-word-select (&optional arg)
   "Move backward by words, extending selection with shift."
   (interactive "^p")
+  (unless (region-active-p)
+    (push-mark (point) nil t))
   (backward-word (or arg 1)))
 
 (defun forward-word-select (&optional arg)
   "Move forward by words, extending selection with shift."
   (interactive "^p")
+  (unless (region-active-p)
+    (push-mark (point) nil t))
   (forward-word (or arg 1)))
 
-;; Bind C-Shift-Arrow keys for word selection
-(global-set-key (kbd "C-S-<left>") 'backward-word-select)
-(global-set-key (kbd "C-S-<right>") 'forward-word-select)
+;; Alternative implementation using left-word/right-word directly
+(defun left-word-select (&optional arg)
+  "Move left by words, extending selection with shift."
+  (interactive "^p")
+  (unless (region-active-p)
+    (push-mark (point) nil t))
+  (left-word (or arg 1)))
+
+(defun right-word-select (&optional arg)
+  "Move right by words, extending selection with shift."
+  (interactive "^p")
+  (unless (region-active-p)
+    (push-mark (point) nil t))
+  (right-word (or arg 1)))
+
+;; Bind C-Shift-Arrow keys for word selection - multiple approaches
+;; Use the built-in left-word/right-word with shift handling
+(global-set-key (kbd "C-S-<left>") 'left-word-select)
+(global-set-key (kbd "C-S-<right>") 'right-word-select)
+
+;; Alternative bindings for compatibility
+(global-set-key [(control shift left)] 'left-word-select)
+(global-set-key [(control shift right)] 'right-word-select)
+
+;; Add C-Shift-Up/Down for paragraph selection
+(defun backward-paragraph-select (&optional arg)
+  "Move backward by paragraphs, extending selection with shift."
+  (interactive "^p")
+  (unless (region-active-p)
+    (push-mark (point) nil t))
+  (backward-paragraph (or arg 1)))
+
+(defun forward-paragraph-select (&optional arg)
+  "Move forward by paragraphs, extending selection with shift."
+  (interactive "^p")
+  (unless (region-active-p)
+    (push-mark (point) nil t))
+  (forward-paragraph (or arg 1)))
+
+(global-set-key (kbd "C-S-<up>") 'backward-paragraph-select)
+(global-set-key (kbd "C-S-<down>") 'forward-paragraph-select)
+(global-set-key [(control shift up)] 'backward-paragraph-select)
+(global-set-key [(control shift down)] 'forward-paragraph-select)
 
 ;; Mark shift-selection functions properly for CUA compatibility
 (put 'backward-word-select 'CUA 'move)
 (put 'forward-word-select 'CUA 'move)
+(put 'left-word-select 'CUA 'move)
+(put 'right-word-select 'CUA 'move)
+(put 'backward-paragraph-select 'CUA 'move)
+(put 'forward-paragraph-select 'CUA 'move)
 (put 'backward-word-select 'shift-selection-mode t)
 (put 'forward-word-select 'shift-selection-mode t)
+(put 'left-word-select 'shift-selection-mode t)
+(put 'right-word-select 'shift-selection-mode t)
+(put 'backward-paragraph-select 'shift-selection-mode t)
+(put 'forward-paragraph-select 'shift-selection-mode t)
+
+;; Ensure bindings work after CUA mode initialization
+(defun ensure-word-selection-bindings ()
+  "Ensure C-Shift-Arrow word selection bindings are active."
+  (global-set-key (kbd "C-S-<left>") 'left-word-select)
+  (global-set-key (kbd "C-S-<right>") 'right-word-select)
+  (global-set-key (kbd "C-S-<up>") 'backward-paragraph-select)
+  (global-set-key (kbd "C-S-<down>") 'forward-paragraph-select)
+  (global-set-key [(control shift left)] 'left-word-select)
+  (global-set-key [(control shift right)] 'right-word-select)
+  (global-set-key [(control shift up)] 'backward-paragraph-select)
+  (global-set-key [(control shift down)] 'forward-paragraph-select))
+
+;; Apply bindings after CUA mode loads
+(with-eval-after-load 'cua-base
+  (ensure-word-selection-bindings))
+
+;; Also apply after init in case CUA mode is loaded later
+(add-hook 'after-init-hook 'ensure-word-selection-bindings)
 
 ;; Additional selection keybindings for consistency
 ;; Ensure regular shift-arrow selection works
@@ -88,6 +159,8 @@
     (princ "  Word Selection:\n")
     (princ (format "    C-S-<left>: %s\n" (key-binding (kbd "C-S-<left>"))))
     (princ (format "    C-S-<right>: %s\n" (key-binding (kbd "C-S-<right>"))))
+    (princ (format "    [(control shift left)]: %s\n" (key-binding [(control shift left)])))
+    (princ (format "    [(control shift right)]: %s\n" (key-binding [(control shift right)])))
     (princ "  Character Selection:\n")
     (princ (format "    S-<left>: %s\n" (key-binding (kbd "S-<left>"))))
     (princ (format "    S-<right>: %s\n" (key-binding (kbd "S-<right>"))))
