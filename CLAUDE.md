@@ -10,10 +10,20 @@ This is a modular Emacs configuration with 33+ configuration modules in the `lis
 
 ### Configuration Management
 ```elisp
-M-x reload-emacs-config        ; Reload entire configuration
-M-x byte-compile-config        ; Byte-compile all config files for faster loading
-M-x clean-byte-compiled-files  ; Remove all .elc files
-M-x byte-compile-init-files    ; Compile only lisp/ directory files
+M-x reload-emacs-config        ; Non-blocking reload (won't freeze UI)
+M-x reload-emacs-config-blocking ; Original blocking reload
+M-x reload-emacs-config-fast  ; Fast reload using byte-compiled files
+M-x reload-emacs-config-smart ; Smart reload (only changed files)
+M-x reload-current-file       ; Reload only current .el file
+M-x byte-compile-config       ; Byte-compile all config files for faster loading
+M-x clean-byte-compiled-files ; Remove all .elc files
+M-x byte-compile-init-files   ; Compile only lisp/ directory files
+
+;; Keybindings:
+C-c C-r   ; Non-blocking reload (default)
+C-u C-c C-r ; Blocking reload (old behavior)
+C-c r     ; Reload current file only
+C-c R     ; Fast reload (byte-compiled)
 ```
 
 ### Emergency Fixes

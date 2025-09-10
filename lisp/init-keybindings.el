@@ -8,7 +8,14 @@
 (global-set-key (kbd "C-x k") 'kill-current-buffer-no-confirm)
 
 ;;; Configuration reload
+;; Default: Non-blocking reload
 (global-set-key (kbd "C-c C-r") 'reload-emacs-config)
+;; C-u prefix: Blocking reload (old behavior)
+(global-set-key (kbd "C-u C-c C-r") 'reload-emacs-config-blocking)
+;; Quick reload for current file only
+(global-set-key (kbd "C-c r") 'reload-current-file)
+;; Fast reload using byte-compiled files
+(global-set-key (kbd "C-c R") 'reload-emacs-config-fast)
 
 ;;; Portfolio tracker
 (global-set-key (kbd "C-c $") 'portfolio-tracker)
