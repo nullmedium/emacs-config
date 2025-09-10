@@ -10,8 +10,7 @@
 ;;; Configuration reload
 ;; Default: Non-blocking reload
 (global-set-key (kbd "C-c C-r") 'reload-emacs-config)
-;; C-u prefix: Blocking reload (old behavior)
-(global-set-key (kbd "C-u C-c C-r") 'reload-emacs-config-blocking)
+;; Note: Use C-u C-c C-r for blocking reload (handled in the function)
 ;; Quick reload for current file only
 (global-set-key (kbd "C-c r") 'reload-current-file)
 ;; Fast reload using byte-compiled files

@@ -18,22 +18,22 @@
   (load-file (expand-file-name "init.el" user-emacs-directory))
 
   ;; Reload development config if it exists
-  (let ((dev-config (expand-file-name "emacs-dev-config.el" user-emacs-directory)))
+  (let ((dev-config (expand-file-name "lisp/emacs-dev-config.el" user-emacs-directory)))
     (when (file-exists-p dev-config)
       (load-file dev-config)))
 
   ;; Reload SHR config if it exists
-  (let ((shr-config (expand-file-name "shr-config.el" user-emacs-directory)))
+  (let ((shr-config (expand-file-name "lisp/shr-config.el" user-emacs-directory)))
     (when (file-exists-p shr-config)
       (load-file shr-config)))
 
   ;; Reload elfeed config if it exists
-  (let ((elfeed-config (expand-file-name "elfeed-config.el" user-emacs-directory)))
+  (let ((elfeed-config (expand-file-name "lisp/elfeed-config.el" user-emacs-directory)))
     (when (file-exists-p elfeed-config)
       (load-file elfeed-config)))
 
   ;; Reload mu4e config if it exists
-  (let ((mu4e-config (expand-file-name "mu4e-config.el" user-emacs-directory)))
+  (let ((mu4e-config (expand-file-name "lisp/mu4e-config.el" user-emacs-directory)))
     (when (file-exists-p mu4e-config)
       (condition-case err
           (load-file mu4e-config)
@@ -79,12 +79,16 @@
             reload-emacs-config-files nil
             reload-emacs-config-index 0))))
 
-(defun reload-emacs-config ()
+(defun reload-emacs-config (&optional arg)
   "Reload Emacs configuration non-blocking with incremental updates.
 This version loads configuration files one by one during idle time
-to prevent UI freezing."
-  (interactive)
-  ;; Cancel any ongoing reload
+to prevent UI freezing. With prefix ARG, use blocking reload."
+  (interactive "P")
+  ;; If prefix arg given, use blocking reload
+  (if arg
+      (reload-emacs-config-blocking)
+    ;; Otherwise, proceed with non-blocking reload
+    ;; Cancel any ongoing reload
   (when reload-emacs-config-timer
     (cancel-timer reload-emacs-config-timer)
     (setq reload-emacs-config-timer nil))
@@ -94,10 +98,10 @@ to prevent UI freezing."
         (cl-remove-if-not
          #'file-exists-p
          (list (expand-file-name "init.el" user-emacs-directory)
-               (expand-file-name "emacs-dev-config.el" user-emacs-directory)
-               (expand-file-name "shr-config.el" user-emacs-directory)
-               (expand-file-name "elfeed-config.el" user-emacs-directory)
-               (expand-file-name "mu4e-config.el" user-emacs-directory))))
+               (expand-file-name "lisp/emacs-dev-config.el" user-emacs-directory)
+               (expand-file-name "lisp/shr-config.el" user-emacs-directory)
+               (expand-file-name "lisp/elfeed-config.el" user-emacs-directory)
+               (expand-file-name "lisp/mu4e-config.el" user-emacs-directory))))
   
   (setq reload-emacs-config-index 0)
   
@@ -105,7 +109,7 @@ to prevent UI freezing."
            (length reload-emacs-config-files))
   
   ;; Start the reload process
-  (reload-emacs-config-process-next))
+  (reload-emacs-config-process-next)))
 
 (defun reload-emacs-config-async ()
   "Reload Emacs configuration asynchronously with progress feedback."
@@ -125,10 +129,10 @@ to prevent UI freezing."
            (cl-remove-if-not
             #'file-exists-p
             (list
-             (expand-file-name "emacs-dev-config.el" user-emacs-directory)
-             (expand-file-name "shr-config.el" user-emacs-directory)
-             (expand-file-name "elfeed-config.el" user-emacs-directory)
-             (expand-file-name "mu4e-config.el" user-emacs-directory)))))
+             (expand-file-name "lisp/emacs-dev-config.el" user-emacs-directory)
+             (expand-file-name "lisp/shr-config.el" user-emacs-directory)
+             (expand-file-name "lisp/elfeed-config.el" user-emacs-directory)
+             (expand-file-name "lisp/mu4e-config.el" user-emacs-directory)))))
     
     (setq total-files (length config-files))
     (setq progress-reporter
@@ -273,14 +277,14 @@ This is the fastest reload method but requires byte-compilation."
 (defun enable-god-mode-config ()
   "Enable god-mode configuration."
   (interactive)
-  (let ((god-config (expand-file-name "god-mode-config.el" user-emacs-directory)))
+  (let ((god-config (expand-file-name "lisp/god-mode-config.el" user-emacs-directory)))
     (if (file-exists-p god-config)
         (condition-case err
             (progn
               (load-file god-config)
               (message "God-mode configuration loaded. Press ESC to toggle god-mode."))
           (error (message "Failed to load god-mode config: %s" err)))
-      (message "God-mode config file not found at %s" god-config))))
+      (message "God-mode config file not found at %s" god-config)))))
 
 (provide 'init-utils)
 ;;; init-utils.el ends here

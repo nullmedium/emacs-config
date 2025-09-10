@@ -9,7 +9,7 @@
   :ensure t
   :defer t
   :commands deadgrep
-  :bind (("C-c d g" . deadgrep)))
+  :bind (("C-c G d" . deadgrep)))
 
 ;;; Wgrep - editable grep buffers
 (use-package wgrep
@@ -31,17 +31,23 @@
   (defun search-project-for-symbol-at-point ()
     "Search project for symbol at point using consult-ripgrep."
     (interactive)
-    (require 'projectile)
-    (if (use-region-p)
-        (consult-ripgrep (projectile-project-root) 
-                         (buffer-substring-no-properties (region-beginning) (region-end)))
-      (consult-ripgrep (projectile-project-root) (thing-at-point 'symbol))))
+    (require 'project)
+    (let ((root (or (when-let ((proj (project-current)))
+                      (project-root proj))
+                    default-directory)))
+      (if (use-region-p)
+          (consult-ripgrep root
+                           (buffer-substring-no-properties (region-beginning) (region-end)))
+        (consult-ripgrep root (thing-at-point 'symbol)))))
 
   (defun search-project ()
     "Live search in project files using consult-ripgrep."
     (interactive)
-    (require 'projectile)
-    (consult-ripgrep (projectile-project-root)))
+    (require 'project)
+    (let ((root (or (when-let ((proj (project-current)))
+                      (project-root proj))
+                    default-directory)))
+      (consult-ripgrep root)))
 
   (defun search-current-directory ()
     "Live search in current directory using consult-ripgrep."
@@ -69,18 +75,24 @@
 (define-key search-map (kbd "p") 
   (lambda () (interactive) 
     (require 'consult) 
-    (require 'projectile)
-    (if (fboundp 'search-project)
-        (call-interactively 'search-project)
-      (consult-ripgrep (projectile-project-root)))))
+    (require 'project)
+    (let ((root (or (when-let ((proj (project-current)))
+                      (project-root proj))
+                    default-directory)))
+      (if (fboundp 'search-project)
+          (call-interactively 'search-project)
+        (consult-ripgrep root)))))
 
 (define-key search-map (kbd "s")
   (lambda () (interactive)
     (require 'consult)
-    (require 'projectile) 
-    (if (fboundp 'search-project-for-symbol-at-point)
-        (call-interactively 'search-project-for-symbol-at-point)
-      (consult-ripgrep (projectile-project-root) (thing-at-point 'symbol)))))
+    (require 'project)
+    (let ((root (or (when-let ((proj (project-current)))
+                      (project-root proj))
+                    default-directory)))
+      (if (fboundp 'search-project-for-symbol-at-point)
+          (call-interactively 'search-project-for-symbol-at-point)
+        (consult-ripgrep root (thing-at-point 'symbol))))))
 
 (define-key search-map (kbd "d")
   (lambda () (interactive)
@@ -148,7 +160,9 @@
   (interactive 
    (list (read-string "Search: " (thing-at-point 'symbol))
          (read-string "Replace: ")))
-  (let ((project-root (projectile-project-root)))
+  (let ((project-root (or (when-let ((proj (project-current)))
+                            (project-root proj))
+                          default-directory)))
     (rg search-string "*" project-root)
     (with-current-buffer "*rg*"
       (wgrep-change-to-wgrep-mode)

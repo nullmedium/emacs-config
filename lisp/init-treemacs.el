@@ -18,7 +18,7 @@
          ("C-c T s"   . treemacs-search-file)
          :map treemacs-mode-map
          ("/" . treemacs-search-file)
-         ("C-s" . projectile-find-file)
+         ("C-s" . project-find-file)
          ("s" . consult-ripgrep))
   :config
   (setq treemacs-collapse-dirs                   (if treemacs-python-executable 3 0)
@@ -71,10 +71,8 @@
 
   (treemacs-hide-gitignored-files-mode nil))
 
-(use-package treemacs-projectile
-  :ensure t
-  :after (treemacs projectile)
-  :defer t)
+;; treemacs-projectile is no longer needed with project.el
+;; Treemacs has built-in support for project.el
 
 (use-package treemacs-all-the-icons
   :ensure t
@@ -96,8 +94,8 @@
 (defun treemacs-search-file ()
   "Search for a file in the current project using consult."
   (interactive)
-  (if (fboundp 'projectile-find-file)
-      (projectile-find-file)
+  (if (fboundp 'project-find-file)
+      (project-find-file)
     (consult-find)))
 
 (defun treemacs-open-marked-files ()

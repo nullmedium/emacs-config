@@ -21,7 +21,7 @@
         diff-hl
 
         ;; File management
-        treemacs treemacs-projectile treemacs-all-the-icons
+        treemacs treemacs-all-the-icons
         neotree all-the-icons all-the-icons-dired diredfl
 
         ;; Modern completion ecosystem (replaces Helm)
@@ -34,16 +34,13 @@
         corfu           ; In-buffer completion popup
         cape            ; Completion extensions for Corfu
 
-        ;; Core project management
-        projectile
-
         ;; Markdown & Notes
         markdown-mode markdown-toc grip-mode
         obsidian olivetti
 
         ;; Search and navigation
         deadgrep ripgrep wgrep anzu
-        ibuffer-sidebar ibuffer-projectile
+        ibuffer-sidebar
 
         ;; Required for some functionality
         org dash s f ht spinner lv hydra avy

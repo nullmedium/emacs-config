@@ -15,7 +15,6 @@
     lsp-mode lsp-ui lsp-treemacs
     company company-box
     flycheck yasnippet
-    projectile
     ggtags multiple-cursors expand-region
     hl-todo rainbow-delimiters
     origami  ;; Code folding
@@ -26,7 +25,7 @@
     treemacs-magit
 
     ;; Helm integration for development
-    helm-lsp helm-xref helm-projectile
+    helm-lsp helm-xref
 
     ;; Languages
     clang-format qml-mode company-qml
@@ -114,23 +113,14 @@
     :config
     (yas-global-mode 1)))
 
-(defun dev-mode-setup-projectile ()
-  "Configure projectile for project management."
-  (use-package projectile
-    :ensure t
-    :init
-    (projectile-mode +1)
-    :bind-keymap ("C-c p" . projectile-command-map)
-    :config
-    (setq projectile-completion-system 'helm)
-    (setq projectile-switch-project-action #'projectile-dired)
-    (setq projectile-enable-caching t))
-
-  (use-package helm-projectile
-    :ensure t
-    :after (helm projectile)
-    :config
-    (helm-projectile-on)))
+;; Project management is now handled by project.el in init-project.el
+(defun dev-mode-setup-project ()
+  "Configure project.el for project management."
+  ;; Project configuration is in init-project.el
+  ;; Add any dev-specific project configs here
+  (with-eval-after-load 'project
+    (define-key project-prefix-map (kbd "c") 'project-compile)
+    (define-key project-prefix-map (kbd "t") 'recompile)))
 
 (defun dev-mode-setup-ggtags ()
   "Configure ggtags for code navigation."
@@ -434,7 +424,10 @@
   (defun generate-cpp-tags ()
     "Generate TAGS file for C++ project."
     (interactive)
-    (let ((project-root (or (projectile-project-root) default-directory)))
+    (require 'project)
+    (let ((project-root (or (when-let ((proj (project-current)))
+                              (project-root proj))
+                            default-directory)))
       (shell-command
        (format "cd %s && find . -name '*.cpp' -o -name '*.hpp' -o -name '*.cc' -o -name '*.hh' -o -name '*.c' -o -name '*.h' | etags -"
                project-root))
@@ -444,7 +437,10 @@
   (defun generate-python-tags ()
     "Generate TAGS file for Python project."
     (interactive)
-    (let ((project-root (or (projectile-project-root) default-directory)))
+    (require 'project)
+    (let ((project-root (or (when-let ((proj (project-current)))
+                              (project-root proj))
+                            default-directory)))
       (shell-command
        (format "cd %s && find . -name '*.py' | etags -"
                project-root))
@@ -454,7 +450,10 @@
   (defun generate-all-tags ()
     "Generate TAGS file for both C++ and Python files."
     (interactive)
-    (let ((project-root (or (projectile-project-root) default-directory)))
+    (require 'project)
+    (let ((project-root (or (when-let ((proj (project-current)))
+                              (project-root proj))
+                            default-directory)))
       (shell-command
        (format "cd %s && find . -name '*.cpp' -o -name '*.hpp' -o -name '*.cc' -o -name '*.hh' -o -name '*.c' -o -name '*.h' -o -name '*.py' | etags -"
                project-root))
@@ -524,7 +523,8 @@
     (princ "  C-c C-q    : Quick compile and run\n")
     (princ "  C-c C-c    : Recompile (C++) or Send buffer to Python\n\n")
     (princ "PROJECT MANAGEMENT:\n")
-    (princ "  C-c p      : Projectile commands prefix\n\n")
+    (princ "  C-x p      : Project commands prefix\n")
+    (princ "  C-c p      : Additional project bindings (compatibility)\n\n")
     (princ "VERSION CONTROL (MAGIT):\n")
     (princ "  C-x g      : Magit status\n")
     (princ "  C-x M-g    : Magit dispatch\n")
@@ -568,7 +568,7 @@
     (dev-mode-setup-company)
     (dev-mode-setup-flycheck)
     (dev-mode-setup-yasnippet)
-    (dev-mode-setup-projectile)
+    (dev-mode-setup-project)
     (dev-mode-setup-ggtags)
     (dev-mode-setup-origami)
     (dev-mode-setup-editing-tools)
@@ -598,7 +598,7 @@
     (global-company-mode -1)
     (global-flycheck-mode -1)
     (yas-global-mode -1)
-    (projectile-mode -1)
+    ;; Project.el is built-in, no need to disable
     (global-hl-todo-mode -1)
     ;; Re-enable elfeed auto-updates
     (when (fboundp 'elfeed-start-auto-updates)

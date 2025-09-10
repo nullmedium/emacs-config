@@ -7,7 +7,9 @@
 ;; Function to check if ESLint is configured in the current project
 (defun project-has-eslint-config-p ()
   "Check if the current project has ESLint configuration."
-  (let ((project-root (or (projectile-project-root)
+  (require 'project)
+  (let ((project-root (or (when-let ((proj (project-current)))
+                            (project-root proj))
                           (locate-dominating-file default-directory ".git")
                           default-directory)))
     (or (file-exists-p (expand-file-name ".eslintrc" project-root))
@@ -62,7 +64,9 @@
 (defun create-basic-eslintrc ()
   "Create a basic .eslintrc.json file in the project root."
   (interactive)
-  (let* ((project-root (or (projectile-project-root)
+  (require 'project)
+  (let* ((project-root (or (when-let ((proj (project-current)))
+                             (project-root proj))
                            (locate-dominating-file default-directory ".git")
                            default-directory))
          (eslintrc-path (expand-file-name ".eslintrc.json" project-root)))

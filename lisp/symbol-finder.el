@@ -53,10 +53,9 @@
 (defun symbol-finder--get-root ()
   "Get the root directory for symbol operations."
   (or symbol-finder-root-directory
-      (when (fboundp 'projectile-project-root)
-        (projectile-project-root))
       (when (fboundp 'project-root)
-        (car (project-roots (project-current))))
+        (and (project-current)
+             (project-root (project-current))))
       default-directory))
 
 (defun symbol-finder--get-cache-dir ()

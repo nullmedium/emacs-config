@@ -122,9 +122,9 @@
   (define-key consult-narrow-map (vconcat consult-narrow-key "?") #'consult-narrow-help)
 
   ;; By default `consult-project-function' uses `project-root' from project.el.
-  ;; Configure a different project root function.
-  (autoload 'projectile-project-root "projectile")
-  (setq consult-project-function (lambda (_) (projectile-project-root))))
+  ;; No need to override - consult will use project.el by default
+  ;; (setq consult-project-function #'project-root) ; This is the default
+  )
 
 ;;; Embark - Contextual actions
 (use-package embark
@@ -212,7 +212,9 @@
 (defun consult-ripgrep-project-root ()
   "Search project root with ripgrep."
   (interactive)
-  (let ((root (or (projectile-project-root) default-directory)))
+  (let ((root (or (when-let ((proj (project-current)))
+                    (project-root proj))
+                  default-directory)))
     (consult-ripgrep root)))
 
 ;; Quick access to ripgrep - C-c r for backward compatibility
@@ -220,10 +222,8 @@
 ;; Additional quick binding for project search
 (global-set-key (kbd "C-c /") 'consult-ripgrep-project-root)
 
-;;; Make completion work nicely with Projectile
-(with-eval-after-load 'projectile
-  (define-key projectile-command-map (kbd "b") #'consult-project-buffer)
-  (define-key projectile-command-map (kbd "r") #'consult-ripgrep))
+;;; Make completion work nicely with project.el
+;; These are now integrated via C-x p prefix by default
 
 (provide 'init-completion)
 ;;; init-completion.el ends here

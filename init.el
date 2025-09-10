@@ -36,6 +36,7 @@
 (require 'init-eglot)     ; Built-in LSP client
 (require 'init-eslint-fix); Fix ESLint configuration issues
 (require 'init-terminal)  ; Terminal emulator configuration
+(require 'init-org)       ; Org mode configuration with TODO keywords
 
 ;;; Load optional configurations
 

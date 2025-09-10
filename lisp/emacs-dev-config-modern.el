@@ -15,7 +15,6 @@
     consult-eglot  ; Consult integration with Eglot
     flycheck  ; Can still use alongside Flymake
     yasnippet
-    projectile
     ggtags
     multiple-cursors expand-region
     hl-todo rainbow-delimiters
@@ -92,13 +91,14 @@
     :config
     (setq flycheck-display-errors-delay 0.3)))
 
-(defun dev-mode-modern-setup-projectile ()
-  "Configure projectile for project management."
+(defun dev-mode-modern-setup-project ()
+  "Configure project.el for project management."
   ;; Already configured in init-project.el
   ;; Add development-specific configurations here
-  (with-eval-after-load 'projectile
-    (define-key projectile-command-map (kbd "t") 'projectile-test-project)
-    (define-key projectile-command-map (kbd "c") 'projectile-compile-project)))
+  (with-eval-after-load 'project
+    ;; Add test and compile commands to project prefix
+    (define-key project-prefix-map (kbd "t") 'project-compile)
+    (define-key project-prefix-map (kbd "T") 'recompile)))
 
 (defun dev-mode-modern-setup-magit ()
   "Configure Magit for version control."
@@ -181,8 +181,8 @@
   (global-set-key (kbd "<f6>") 'recompile)
   
   ;; Testing - use C-c C-t prefix to avoid conflict with CUA copy
-  (global-set-key (kbd "C-c C-t p") 'projectile-test-project)
-  (global-set-key (kbd "C-c C-t f") 'projectile-test-file)
+  (global-set-key (kbd "C-c C-t p") 'project-compile)
+  (global-set-key (kbd "C-c C-t r") 'recompile)
   
   ;; Navigation
   (global-set-key (kbd "M-.") 'xref-find-definitions)
@@ -203,7 +203,7 @@
     (dev-mode-modern-setup-completion)
     (dev-mode-modern-setup-yasnippet)
     (dev-mode-modern-setup-flycheck)
-    (dev-mode-modern-setup-projectile)
+    (dev-mode-modern-setup-project)
     (dev-mode-modern-setup-magit)
     (dev-mode-modern-setup-debugging)
     (dev-mode-modern-setup-languages)
