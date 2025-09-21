@@ -100,13 +100,13 @@
 (setq ring-bell-function 'ignore)
 
 ;; Auto-save and backup settings
-(setq backup-directory-alist '(("." . "~/.emacs.d/backups")))
+(setq backup-directory-alist `(("." . ,(expand-file-name "backups" user-emacs-directory))))
 (setq delete-old-versions t
       kept-new-versions 6
       kept-old-versions 2
       version-control t)
 (setq auto-save-file-name-transforms
-      '((".*" "~/.emacs.d/auto-save-list/" t)))
+      `((".*" ,(expand-file-name "auto-save-list/" user-emacs-directory) t)))
 
 ;; Use ls-lisp (Emacs's built-in ls emulation) for better cross-platform compatibility
 (setq ls-lisp-use-insert-directory-program nil)
@@ -114,10 +114,10 @@
 
 ;;; Session Management
 (save-place-mode 1)
-(setq save-place-file "~/.emacs.d/saveplace")
+(setq save-place-file (expand-file-name "saveplace" user-emacs-directory))
 
 (savehist-mode 1)
-(setq savehist-file "~/.emacs.d/savehist")
+(setq savehist-file (expand-file-name "savehist" user-emacs-directory))
 (setq history-length 1000)
 
 (recentf-mode 1)
@@ -138,8 +138,8 @@
               (desktop-save-mode 1)
               (setq desktop-save t)
               (setq desktop-auto-save-timeout 300)
-              (setq desktop-path '("~/.emacs.d/"))
-              (setq desktop-dirname "~/.emacs.d/")
+              (setq desktop-path (list user-emacs-directory))
+              (setq desktop-dirname user-emacs-directory)
               (setq desktop-base-file-name "emacs-desktop")
               (setq desktop-restore-frames t)
               ;; Load desktop after a delay

@@ -5,6 +5,9 @@
 
 ;;; Code:
 
+;; Set user-emacs-directory to use XDG config location
+(setq user-emacs-directory (expand-file-name "~/.config/emacs/"))
+
 ;; Defer garbage collection further back in the startup process
 ;; This makes startup faster by preventing frequent GC
 (setq gc-cons-threshold most-positive-fixnum

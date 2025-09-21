@@ -28,7 +28,7 @@
   :config
   (setq undo-tree-visualizer-timestamps t)
   (setq undo-tree-visualizer-diff t)
-  (setq undo-tree-history-directory-alist '(("." . "~/.emacs.d/undo-tree-history")))
+  (setq undo-tree-history-directory-alist `(("." . ,(expand-file-name "undo-tree-history" user-emacs-directory))))
   (setq undo-tree-auto-save-history t)
   :bind (("C-x u" . undo-tree-visualize)
          ("C-/" . undo-tree-undo)
