@@ -8,6 +8,25 @@
 (global-auto-revert-mode t)
 ;; Electric-pair-mode is replaced by smartparens in init-qol.el
 
+;;; Whitespace handling
+;; Show trailing whitespace in programming modes
+(add-hook 'prog-mode-hook
+          (lambda ()
+            (setq show-trailing-whitespace t)))
+
+;; Also show trailing whitespace in text modes
+(add-hook 'text-mode-hook
+          (lambda ()
+            (setq show-trailing-whitespace t)))
+
+;; Delete trailing whitespace on save
+(add-hook 'before-save-hook 'delete-trailing-whitespace)
+
+;; Optionally, you can make trailing whitespace more visible
+(setq-default show-trailing-whitespace t)
+(custom-set-faces
+ '(trailing-whitespace ((t (:background "red1")))))
+
 ;;; Shift-Selection Configuration
 ;; Enable shift-select mode for selecting text with Shift+Arrow keys
 (setq shift-select-mode t)
